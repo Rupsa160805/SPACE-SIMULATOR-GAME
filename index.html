@@ -2,26 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🚀 Space Mission Simulator</title>
+  <title>Space Mission Simulator Game</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Three.js Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-<body>
-  <h1>🚀 Space Mission Simulator</h1>
+<body style="text-align:center; font-family: Arial; background:black; color:white;">
+
+  <h1>Welcome to Space Mission Simulator Game!</h1>
+  <p>Select your mission</p>
 
   <!-- Mission Menu -->
-  <div id="menu">
-    <button onclick="startMission('satellite')">🛰 Satellite Launch</button>
-    <button onclick="startMission('moon')">🌙 Moon Mission</button>
-    <button onclick="startMission('mars')">🔴 Mars Mission</button>
-    <button onclick="startMission('zodiac')">✨ Zodiac Mission</button>
+  <div id="menu" style="margin: 20px;">
+    <button onclick="window.location.href='satellite.html'">🛰 Satellite Launch</button>
+    <button onclick="alert('🚀 Moon Mission page coming soon!')">Moon Mission</button>
+    <button onclick="alert('🚀 Mars Mission page coming soon!')">Mars Mission</button>
+    <button onclick="alert('🚀 Zodiac Mission page coming soon!')">Zodiac Mission</button>
   </div>
 
-  <!-- 3D Canvas (Three.js) -->
-  <div id="game"></div>
-
-  <!-- Game Script -->
-  <script src="script.js"></script>
 </body>
 </html>

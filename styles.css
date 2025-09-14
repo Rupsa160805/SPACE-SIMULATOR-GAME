@@ -1,37 +1,144 @@
-body {
+/* General Reset */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+}
+
+/* Body - Dark Space Theme */
+body {
+  background: radial-gradient(circle at top, #0a0f2c, #000000);
+  color: #f0f0f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+header {
+  background: rgba(10, 20, 40, 0.9);
+  padding: 15px;
   text-align: center;
-  background: black;
-  color: white;
-  font-family: Arial, sans-serif;
+  border-bottom: 2px solid #1e90ff;
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.6);
 }
 
-h1 {
-  margin: 10px;
+header h1 {
   font-size: 28px;
-  color: #ffd700;
+  color: #ffcc00;
+  text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffaa00;
 }
 
-#menu {
-  margin: 20px;
+/* Navigation Bar */
+nav {
+  margin-top: 10px;
 }
 
-button {
-  margin: 5px;
-  padding: 10px 20px;
-  border: none;
+nav a {
+  color: #ffffff;
+  text-decoration: none;
+  margin: 0 15px;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+nav a:hover {
   background: #1e90ff;
-  color: white;
+  color: #000;
+  box-shadow: 0 0 10px #1e90ff, 0 0 20px #1e90ff;
+}
+
+/* Main Content */
+main {
+  flex: 1;
+  padding: 30px;
+  text-align: center;
+}
+
+main h2 {
+  color: #1e90ff;
+  margin-bottom: 15px;
+  text-shadow: 0 0 8px #1e90ff;
+}
+
+main p {
+  font-size: 18px;
+  margin: 15px auto;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* Buttons */
+button {
+  padding: 12px 20px;
+  margin-top: 15px;
+  background: #1e90ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
   font-size: 16px;
-  border-radius: 10px;
   cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 0 12px #1e90ff, 0 0 20px #1e90ff;
 }
 
 button:hover {
-  background: #00bfff;
+  background: #ffcc00;
+  color: #000;
+  box-shadow: 0 0 15px #ffcc00, 0 0 25px #ffaa00;
 }
 
+/* Game Canvas Area */
 #game {
   width: 100%;
-  height: 80vh;
+  height: 500px;
+  background: #000;
+  border: 2px solid #1e90ff;
+  border-radius: 10px;
+  margin: 20px auto;
+  box-shadow: 0 0 20px #1e90ff;
+}
+
+/* Contact Form */
+form {
+  background: rgba(20, 20, 40, 0.8);
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+  margin: 20px auto;
+  box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+}
+
+form label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+form input, form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+  font-size: 16px;
+}
+
+form button {
+  width: 100%;
+}
+
+/* Footer */
+footer {
+  background: rgba(10, 20, 40, 0.9);
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #aaa;
+  border-top: 2px solid #1e90ff;
 }

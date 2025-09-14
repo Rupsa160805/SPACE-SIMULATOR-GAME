@@ -1,40 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Satellite Mission</title>
+  <meta charset="UTF-8">
+  <title>Satellite Launch Mission</title>
   <style>
-    body { margin: 0; overflow: hidden; background: black; color: white; }
-    #game { width: 100vw; height: 100vh; display: block; }
+    body { margin: 0; overflow: hidden; background:black; color:white; }
     #hud {
-      position: absolute; top: 10px; left: 10px; 
-      background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px;
-      font-family: Arial; font-size: 14px;
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.6); padding: 10px;
+      border-radius: 6px; font-family: Arial;
     }
+    #game { width: 100vw; height: 100vh; display:block; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
   <div id="hud">🛰 Use ⬆️⬅️➡️ to move your satellite</div>
   <div id="game"></div>
 
-  <!-- Three.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
   <script>
-    // ===== SETUP SCENE =====
+    // === SCENE SETUP ===
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     let renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("game").appendChild(renderer.domElement);
 
-    // ===== LIGHTS =====
+    // === LIGHTS ===
     let light = new THREE.PointLight(0xffffff, 1.5, 100);
     light.position.set(10, 10, 10);
     scene.add(light);
 
-    // ===== EARTH =====
+    // === EARTH ===
     let earthTexture = new THREE.TextureLoader().load(
       "https://threejsfundamentals.org/threejs/resources/images/earthmap1k.jpg"
     );
@@ -44,7 +41,7 @@
     );
     scene.add(earth);
 
-    // ===== SATELLITE =====
+    // === SATELLITE ===
     let satellite = new THREE.Mesh(
       new THREE.BoxGeometry(0.5, 0.5, 1),
       new THREE.MeshPhongMaterial({ color: "silver" })
@@ -52,11 +49,11 @@
     satellite.position.set(0, 3, 5);
     scene.add(satellite);
 
-    // ===== STARS =====
+    // === STARS ===
     function createStars() {
       let starGeo = new THREE.SphereGeometry(0.05, 24, 24);
       let starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-      for (let i = 0; i < 500; i++) {
+      for (let i = 0; i < 300; i++) {
         let star = new THREE.Mesh(starGeo, starMat);
         star.position.set(
           (Math.random() - 0.5) * 100,
@@ -68,13 +65,12 @@
     }
     createStars();
 
-    // ===== CAMERA =====
+    // === CAMERA ===
     camera.position.z = 10;
     camera.position.y = 5;
 
-    // ===== CONTROLS =====
+    // === CONTROLS ===
     let keys = { ArrowUp: false, ArrowLeft: false, ArrowRight: false };
-
     window.addEventListener("keydown", (e) => {
       if (keys[e.code] !== undefined) keys[e.code] = true;
     });
@@ -82,20 +78,18 @@
       if (keys[e.code] !== undefined) keys[e.code] = false;
     });
 
-    // ===== ANIMATION LOOP =====
+    // === ANIMATION ===
     function animate() {
       requestAnimationFrame(animate);
 
-      // Earth spins
-      earth.rotation.y += 0.002;
+      earth.rotation.y += 0.002; // Earth spins
 
-      // Move satellite with keys
+      // Move satellite with arrow keys
       if (keys.ArrowUp) satellite.position.y += 0.05;
       if (keys.ArrowLeft) satellite.position.x -= 0.05;
       if (keys.ArrowRight) satellite.position.x += 0.05;
 
-      // Satellite rotates slowly
-      satellite.rotation.y += 0.01;
+      satellite.rotation.y += 0.01; // satellite rotation
 
       renderer.render(scene, camera);
     }

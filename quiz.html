@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Quiz</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🌌 Space Quiz</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="games.html">Games</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Test Your Space Knowledge!</h2>
+    <div id="quiz-container">
+      <p id="question">Loading question...</p>
+      <div id="options"></div>
+      <button onclick="nextQuestion()">Next</button>
+      <p id="result"></p>
+    </div>
+  </main>
+
+  <footer>
+    <p>🚀 Good Luck, Young Astronaut!</p>
+  </footer>
+
+  <script>
+    const quizData = [
+      {
+        question: "Which planet is called the Red Planet?",
+        options: ["Earth", "Mars", "Jupiter", "Venus"],
+        answer: "Mars"
+      },
+      {
+        question: "Which is the largest planet in our solar system?",
+        options: ["Saturn", "Jupiter", "Neptune", "Earth"],
+        answer: "Jupiter"
+      },
+      {
+        question: "Who was the first person to walk on the Moon?",
+        options: ["Yuri Gagarin", "Buzz Aldrin", "Neil Armstrong", "Kalpana Chawla"],
+        answer: "Neil Armstrong"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      let q = quizData[currentQuestion];
+      document.getElementById("question").textContent = q.question;
+      let optionsHTML = "";
+      q.options.forEach(opt => {
+        optionsHTML += `<button onclick="checkAnswer('${opt}')">${opt}</button>`;
+      });
+      document.getElementById("options").innerHTML = optionsHTML;
+    }
+
+    function checkAnswer(selected) {
+      let result = document.getElementById("result");
+      if (selected === quizData[currentQuestion].answer) {
+        score++;
+        result.textContent = "✅ Correct!";
+      } else {
+        result.textContent = "❌ Wrong! The correct answer is " + quizData[currentQuestion].answer;
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      document.getElementById("result").textContent = "";
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        document.getElementById("quiz-container").innerHTML = `<h3>🎉 You scored ${score}/${quizData.length}!</h3>`;
+      }
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Puzzle</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🧩 Space Puzzle</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="games.html">Games</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Match the Planet to Its Fact!</h2>
+    <p>Click to reveal pairs!</p>
+    <div id="puzzle-container"></div>
+  </main>
+
+  <footer>
+    <p>⭐ Match them all to win!</p>
+  </footer>
+
+  <script>
+    const cards = [
+      "🌍 Earth", "Supports Life",
+      "🪐 Saturn", "Has Rings",
+      "🔴 Mars", "Red Planet",
+      "☀️ Sun", "Center of Solar System"
+    ];
+
+    let shuffled = cards.sort(() => 0.5 - Math.random());
+    let puzzleContainer = document.getElementById("puzzle-container");
+
+    shuffled.forEach((c, i) => {
+      let card = document.createElement("button");
+      card.textContent = "❓";
+      card.setAttribute("data-value", c);
+      card.onclick = flipCard;
+      puzzleContainer.appendChild(card);
+    });
+
+    let firstCard = null;
+    function flipCard(e) {
+      let btn = e.target;
+      btn.textContent = btn.getAttribute("data-value");
+
+      if (!firstCard) {
+        firstCard = btn;
+      } else {
+        if (firstCard.getAttribute("data-value").includes(btn.textContent) ||
+            btn.getAttribute("data-value").includes(firstCard.textContent)) {
+          // Match found
+          firstCard.disabled = true;
+          btn.disabled = true;
+        } else {
+          setTimeout(() => {
+            firstCard.textContent = "❓";
+            btn.textContent = "❓";
+          }, 800);
+        }
+        firstCard = null;
+      }
+    }
+  </script>
+</body>
+</html>

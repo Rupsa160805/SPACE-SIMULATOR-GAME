@@ -35,7 +35,8 @@ nav {
   margin-top: 10px;
 }
 
-nav a {
+nav a,
+nav button {
   color: #ffffff;
   text-decoration: none;
   margin: 0 15px;
@@ -43,9 +44,13 @@ nav a {
   padding: 8px 15px;
   border-radius: 6px;
   transition: 0.3s;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
-nav a:hover {
+nav a:hover,
+nav button:hover {
   background: #1e90ff;
   color: #000;
   box-shadow: 0 0 10px #1e90ff, 0 0 20px #1e90ff;
@@ -119,7 +124,8 @@ form label {
   color: #ffcc00;
 }
 
-form input, form textarea {
+form input,
+form textarea {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
@@ -141,4 +147,44 @@ footer {
   font-size: 14px;
   color: #aaa;
   border-top: 2px solid #1e90ff;
+}
+
+/* ---------- QUIZ & PUZZLE (Games Page) ---------- */
+
+.game-section {
+  padding: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+#quiz-container button,
+#puzzle-container button {
+  background: #e63946;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 5px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#quiz-container button:hover,
+#puzzle-container button:hover {
+  background: #ffcc00;
+  color: #000;
+  box-shadow: 0 0 10px #ffcc00, 0 0 20px #ffaa00;
+}
+
+#puzzle-container {
+  margin-top: 20px;
+}
+
+#result {
+  font-size: 18px;
+  margin-top: 15px;
+  color: #ffcc00;
+  text-shadow: 0 0 8px #ffaa00;
 }

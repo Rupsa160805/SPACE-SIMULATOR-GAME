@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Space Mission Simulator - Home</title>
+  <title>Space Mission Simulator</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -10,16 +10,28 @@
     <h1>🚀 Space Mission Simulator</h1>
     <nav>
       <a href="index.html">Home</a>
-      <a href="satellite.html">Satellite Launch</a>
       <a href="about.html">About Us</a>
+      <a href="satellite.html">Satellite Launch</a>
+      <a href="games.html">Games</a>
       <a href="contact.html">Contact</a>
     </nav>
   </header>
 
   <main>
-    <h2>Welcome to the Space Mission Simulator!</h2>
-    <p>Experience launching satellites, exploring the Moon, Mars, and even the stars.</p>
-    <button onclick="location.href='satellite.html'">Start Satellite Mission 🚀</button>
+    <h2>Welcome to Space Mission Simulator</h2>
+    <p>Choose a mission and explore the wonders of space! 🌌</p>
+
+    <!-- Mission Menu -->
+    <div id="menu">
+      <button onclick="location.href='satellite.html'">Satellite Launch</button>
+      <button onclick="alert('Moon Mission Coming Soon!')">Moon Mission</button>
+      <button onclick="alert('Mars Mission Coming Soon!')">Mars Mission</button>
+      <button onclick="alert('Zodiac Mission Coming Soon!')">Zodiac Mission</button>
+    </div>
   </main>
+
+  <footer>
+    <p>© 2025 Space Mission Simulator. All Rights Reserved.</p>
+  </footer>
 </body>
 </html>

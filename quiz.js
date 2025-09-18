@@ -2,6 +2,8 @@ const quizData = [
   { question: "Which planet is known as the Red Planet?", options: ["Earth", "Mars", "Jupiter"], answer: "Mars" },
   { question: "Who was the first person to walk on the Moon?", options: ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin"], answer: "Neil Armstrong" },
   { question: "Which is the largest planet in our Solar System?", options: ["Saturn", "Jupiter", "Neptune"], answer: "Jupiter" }
+  { question: "What is the name of India’s first satellite?", options: ["Aryabhata", "Chandrayaan", "Mangalyaan"], answer: "Aryabhata" },
+  { question: "What is the name of a space object so strong that not even light can escape from it?", options: ["Supernova", "Black Hole", "Galaxy"], answer: "Black Hole" },
 ];
 
 let currentQuestion = 0;
@@ -33,3 +35,4 @@ function checkAnswer(selected) {
 }
 
 loadQuiz();
+

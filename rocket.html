@@ -3,83 +3,99 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Real Rocket Launch</title>
+<title>Rocket Launch Simulator</title>
 <style>
-  body { margin:0; background:#000; color:white; font-family:Arial, sans-serif; }
-  canvas { display:block; width:100%; height:100vh; background:linear-gradient(#87cefa, #001d3d); }
-  #countdown {
+  body { margin:0; background:#000; color:white; font-family:Arial, sans-serif; overflow:hidden; }
+  canvas { display:block; width:100vw; height:100vh; background:linear-gradient(#87cefa, #001d3d); }
+  #info {
     position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 4rem;
-    font-weight: bold;
-    color: yellow;
-    text-shadow: 0 0 15px red, 0 0 30px orange;
-    display: none;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.6);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #fff;
   }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="countdown"></div>
+<div id="info">
+  <b>Controls:</b><br>
+  ↑ / W = Thrust<br>
+  ← / A = Left<br>
+  → / D = Right<br>
+</div>
 
 <script>
 (() => {
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d');
-  const countdownEl = document.getElementById('countdown');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
   // Rocket state
-  let rocket = { x: canvas.width/2, y: canvas.height-100, vy: 0, thrust: false, fuel: 100 };
-  let running = false;
-  let lastTime = null;
+  let rocket = { x: canvas.width/2, y: canvas.height-100, vy: 0, vx: 0, angle: 0, thrust: false, fuel: 100 };
+  let keys = {};
   let particles = [];
   let stars = [];
   
-  // Create stars
+  // Generate stars
   for(let i=0;i<200;i++){
-    stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,visible:false});
+    stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height});
   }
 
+  // Background
   function drawBackground() {
-    // Sky color changes with altitude
-    let progress = Math.min(1, rocket.y / canvas.height);
+    let progress = Math.max(0, 1 - rocket.y / canvas.height);
     let g = ctx.createLinearGradient(0,0,0,canvas.height);
-    g.addColorStop(0, progress > 0.5 ? "#000010" : "#87cefa");
+    g.addColorStop(0, progress < 0.4 ? "#000010" : "#87cefa");
     g.addColorStop(1, "#001d3d");
     ctx.fillStyle = g;
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    // Show stars above certain altitude
+    // Stars
     if(rocket.y < canvas.height/2){
       ctx.fillStyle="white";
-      stars.forEach(s=>{
-        ctx.fillRect(s.x,s.y,2,2);
-      });
+      stars.forEach(s=>ctx.fillRect(s.x,s.y,2,2));
     }
   }
 
+  // Rocket drawing (more realistic)
   function drawRocket() {
     ctx.save();
     ctx.translate(rocket.x, rocket.y);
+    ctx.rotate(rocket.angle);
 
     // Body
     ctx.fillStyle="silver";
-    ctx.fillRect(-10,-40,20,40);
+    ctx.fillRect(-10,-50,20,50);
 
     // Nose cone
     ctx.beginPath();
-    ctx.moveTo(-10,-40);
-    ctx.lineTo(0,-60);
-    ctx.lineTo(10,-40);
+    ctx.moveTo(-10,-50);
+    ctx.lineTo(0,-70);
+    ctx.lineTo(10,-50);
     ctx.closePath();
     ctx.fillStyle="red";
     ctx.fill();
 
-    // Flames
+    // Fins
+    ctx.fillStyle="blue";
+    ctx.beginPath();
+    ctx.moveTo(-10,0);
+    ctx.lineTo(-25,15);
+    ctx.lineTo(-10,15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(10,0);
+    ctx.lineTo(25,15);
+    ctx.lineTo(10,15);
+    ctx.closePath();
+    ctx.fill();
+
+    // Flame
     if(rocket.thrust && rocket.fuel>0){
       let flameLen = 20 + Math.random()*20;
       let grad = ctx.createLinearGradient(0,0,0,flameLen);
@@ -114,14 +130,27 @@
   }
 
   function update(dt) {
-    if(!running) return;
-    if(rocket.fuel>0 && rocket.thrust){
+    // Controls
+    if(keys["ArrowUp"] || keys["w"]){ rocket.thrust=true; }
+    else { rocket.thrust=false; }
+    if(keys["ArrowLeft"] || keys["a"]){ rocket.vx -= 0.01*dt; }
+    if(keys["ArrowRight"] || keys["d"]){ rocket.vx += 0.01*dt; }
+
+    // Thrust
+    if(rocket.thrust && rocket.fuel>0){
       rocket.vy -= 0.02*dt;
-      rocket.fuel-=0.02*dt;
+      rocket.fuel-=0.01*dt;
     }
-    rocket.vy+=0.01*dt; // gravity
-    rocket.y+=rocket.vy;
-    if(rocket.y>canvas.height-100) rocket.y=canvas.height-100;
+
+    // Physics
+    rocket.vy += 0.01*dt; // gravity
+    rocket.y += rocket.vy;
+    rocket.x += rocket.vx;
+
+    // Boundaries
+    if(rocket.y>canvas.height-50){ rocket.y=canvas.height-50; rocket.vy=0; }
+    if(rocket.x<20) rocket.x=20;
+    if(rocket.x>canvas.width-20) rocket.x=canvas.width-20;
   }
 
   function draw() {
@@ -139,27 +168,12 @@
     requestAnimationFrame(loop);
   }
 
-  function startLaunch(){
-    let count=3;
-    countdownEl.style.display="block";
-    countdownEl.textContent=count;
-    let timer=setInterval(()=>{
-      count--;
-      if(count>0){
-        countdownEl.textContent=count;
-      } else {
-        clearInterval(timer);
-        countdownEl.textContent="LIFT OFF!";
-        setTimeout(()=>countdownEl.style.display="none",1000);
-        running=true;
-        rocket.thrust=true;
-      }
-    },1000);
-  }
-
-  // Start automatically
-  startLaunch();
+  let lastTime=null;
   requestAnimationFrame(loop);
+
+  // Key events
+  window.addEventListener("keydown",e=>keys[e.key]=true);
+  window.addEventListener("keyup",e=>keys[e.key]=false);
 })();
 </script>
 </body>

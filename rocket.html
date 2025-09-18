@@ -3,416 +3,164 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Spaceflight Prototype</title>
+<title>Real Rocket Launch</title>
 <style>
-  :root{
-    --bg:#e9f2ff; --panel:#ffffff; --text:#0b2545; --accent:#0a84ff;
-  }
-  [data-theme="dark"]{
-    --bg:#061025; --panel:#071227; --text:#d7eefc; --accent:#5cc3ff;
-  }
-  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);}
-  .wrap{display:flex;gap:16px;padding:12px;align-items:flex-start;max-width:1200px;margin:0 auto;}
-  .game{
-    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.02));
-    border-radius:12px;box-shadow:0 6px 24px rgba(2,6,23,0.12);overflow:hidden;flex:1;min-width:320px;
-  }
-  canvas{display:block;width:100%;height:600px;background:linear-gradient(#87cefa,#5bb0ff);}
-  .panel{width:320px;padding:12px;border-radius:12px;background:var(--panel);box-shadow:0 4px 18px rgba(2,6,23,0.08);}
-  h2{margin:6px 0 12px;}
-  .stat{display:flex;justify-content:space-between;margin:6px 0;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.03);}
-  button, .btn{
-    background:var(--accent);color:white;border:none;padding:10px 12px;border-radius:10px;font-weight:600;cursor:pointer;
-  }
-  .controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
-  .small{font-size:0.9rem;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,0.05);color:var(--text);border:1px solid rgba(0,0,0,0.04)}
-  .hud{position:absolute;left:12px;top:12px;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,0.25);color:white;font-weight:700}
-  .mobile-controls{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
-  .mobile-controls button{width:64px;height:64px;border-radius:12px;opacity:0.9}
-  .legend{font-size:0.85rem;margin-top:12px;color:rgba(0,0,0,0.6)}
-  .footer{font-size:0.8rem;margin-top:10px;color:rgba(0,0,0,0.45)}
-  .toggle{display:flex;gap:8px;align-items:center}
-  @media (max-width:880px){
-    .wrap{flex-direction:column;padding:8px}
-    canvas{height:480px}
-    .panel{width:100%}
+  body { margin:0; background:#000; color:white; font-family:Arial, sans-serif; }
+  canvas { display:block; width:100%; height:100vh; background:linear-gradient(#87cefa, #001d3d); }
+  #countdown {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: bold;
+    color: yellow;
+    text-shadow: 0 0 15px red, 0 0 30px orange;
+    display: none;
   }
 </style>
 </head>
-<body data-theme="light">
-<div style="position:relative">
-  <div class="hud" id="hud">PAUSED</div>
-</div>
-
-<div class="wrap">
-  <div class="game" id="game">
-    <canvas id="c"></canvas>
-
-    <!-- Mobile controls -->
-    <div class="mobile-controls" style="pointer-events:auto">
-      <button id="leftBtn" class="small">◀</button>
-      <button id="thrustBtn" class="small">▲</button>
-      <button id="rightBtn" class="small">▶</button>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2>Spaceflight Prototype</h2>
-    <div class="stat"><div>Altitude</div><div id="alt">0 m</div></div>
-    <div class="stat"><div>Vertical Speed</div><div id="vy">0 m/s</div></div>
-    <div class="stat"><div>Horizontal Speed</div><div id="vx">0 m/s</div></div>
-    <div class="stat"><div>Fuel</div><div id="fuel">100%</div></div>
-    <div class="stat"><div>Angle</div><div id="angle">0°</div></div>
-
-    <div style="margin-top:8px" class="controls">
-      <button id="start" class="btn">Start / Reset</button>
-      <button id="pause" class="small">Pause</button>
-      <div style="flex:1"></div>
-    </div>
-
-    <div style="margin-top:12px" class="controls">
-      <label class="toggle small"><input id="themeToggle" type="checkbox" style="margin-right:8px">Dark mode</label>
-      <label class="small" title="Auto-scale for retina"><input id="pixelToggle" type="checkbox" style="margin-right:8px">High-res</label>
-    </div>
-
-    <p class="legend">Controls: Arrow keys or A/D to rotate, Up/Space to thrust. Use on-screen buttons for touch.</p>
-    <p class="footer">This is a lightweight 2D prototype — extendable to multi-stage rockets, part editor, or 3D with Three.js/Unity export.</p>
-  </div>
-</div>
+<body>
+<canvas id="c"></canvas>
+<div id="countdown"></div>
 
 <script>
 (() => {
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d');
-  const hud = document.getElementById('hud');
-  const altEl = document.getElementById('alt');
-  const vyEl = document.getElementById('vy');
-  const vxEl = document.getElementById('vx');
-  const fuelEl = document.getElementById('fuel');
-  const angleEl = document.getElementById('angle');
-  const startBtn = document.getElementById('start');
-  const pauseBtn = document.getElementById('pause');
-  const themeToggle = document.getElementById('themeToggle');
-  const pixelToggle = document.getElementById('pixelToggle');
-
-  const leftBtn = document.getElementById('leftBtn');
-  const rightBtn = document.getElementById('rightBtn');
-  const thrustBtn = document.getElementById('thrustBtn');
-
-  // Responsive canvas sizing with optional high-res
-  function resize() {
-    const rect = canvas.getBoundingClientRect();
-    const dpr = pixelToggle.checked ? (window.devicePixelRatio || 1) : 1;
-    canvas.width = Math.max(300, Math.floor(rect.width * dpr));
-    canvas.height = Math.max(300, Math.floor(rect.height * dpr));
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  window.addEventListener('resize', resize);
-  pixelToggle.addEventListener('change', resize);
-
-  // Game world
-  const world = {
-    gravity: 0.0016,   // px/ms^2 (tunable)
-    thrustPower: 0.0038, // px/ms^2
-    fuelConsumption: 0.06, // fuel units per ms while thrusting
-    groundHeight: 110, // px from bottom where ground starts
-    targetLandingSpeed: 0.25, // m/s threshold success (approx)
-  };
+  const countdownEl = document.getElementById('countdown');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
   // Rocket state
-  let rocket = {};
-  let lastTime = null;
+  let rocket = { x: canvas.width/2, y: canvas.height-100, vy: 0, thrust: false, fuel: 100 };
   let running = false;
-  let keys = {left:false,right:false,thrust:false};
-  let message = '';
-
-  function reset() {
-    const cw = canvas.clientWidth;
-    const ch = canvas.clientHeight;
-    rocket = {
-      x: cw * 0.5,
-      y: 80, // start near top
-      vx: 0,
-      vy: 0,
-      angle: 0, // radians; 0 = up
-      angularSpeed: 0,
-      mass: 1,
-      fuel: 100,
-      thrusting: false,
-      width: 18,
-      height: 48,
-      parachute: false,
-      crashed: false,
-      landed: false,
-    };
-    lastTime = null;
-    running = true;
-    message = 'LAUNCHED';
-    hud.textContent = message;
+  let lastTime = null;
+  let particles = [];
+  let stars = [];
+  
+  // Create stars
+  for(let i=0;i<200;i++){
+    stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,visible:false});
   }
 
-  function showMessage(msg, timeout=1500){
-    message = msg;
-    hud.textContent = msg;
-    if(timeout) setTimeout(()=> { if(hud.textContent===msg) hud.textContent = running ? '' : 'PAUSED' }, timeout);
-  }
-
-  // Input
-  function setKey(k, v){ keys[k]=v; }
-  window.addEventListener('keydown', e => {
-    if(e.repeat) return;
-    if(e.key === 'ArrowLeft' || e.key.toLowerCase()==='a') setKey('left', true);
-    if(e.key === 'ArrowRight' || e.key.toLowerCase()==='d') setKey('right', true);
-    if(e.key === 'ArrowUp' || e.key === ' ' ) setKey('thrust', true);
-    if(e.key === 'p') togglePause();
-  });
-  window.addEventListener('keyup', e => {
-    if(e.key === 'ArrowLeft' || e.key.toLowerCase()==='a') setKey('left', false);
-    if(e.key === 'ArrowRight' || e.key.toLowerCase()==='d') setKey('right', false);
-    if(e.key === 'ArrowUp' || e.key === ' ' ) setKey('thrust', false);
-  });
-
-  // Touch / button events
-  leftBtn.addEventListener('touchstart', e => { e.preventDefault(); setKey('left', true); });
-  leftBtn.addEventListener('touchend', e => { e.preventDefault(); setKey('left', false); });
-  rightBtn.addEventListener('touchstart', e => { e.preventDefault(); setKey('right', true); });
-  rightBtn.addEventListener('touchend', e => { e.preventDefault(); setKey('right', false); });
-  thrustBtn.addEventListener('touchstart', e => { e.preventDefault(); setKey('thrust', true); });
-  thrustBtn.addEventListener('touchend', e => { e.preventDefault(); setKey('thrust', false); });
-
-  // Buttons
-  startBtn.addEventListener('click', () => { reset(); });
-  pauseBtn.addEventListener('click', togglePause);
-
-  function togglePause(){
-    running = !running;
-    if(!running) hud.textContent = 'PAUSED';
-    else hud.textContent = '';
-    if(running) { lastTime = performance.now(); requestAnimationFrame(loop); }
-  }
-
-  themeToggle.addEventListener('change', ()=>{
-    document.body.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
-  });
-
-  // Physics & update
-  function update(dt) {
-    if(!running) return;
-    if(rocket.crashed || rocket.landed) return;
-
-    // Rotation control
-    const rotSpeed = 0.0022 * dt; // radians per ms
-    if(keys.left) rocket.angle -= rotSpeed;
-    if(keys.right) rocket.angle += rotSpeed;
-
-    // Thrust
-    if(keys.thrust && rocket.fuel > 0) {
-      rocket.thrusting = true;
-      // thrust vector: angle rotated (0 = up)
-      const ax = Math.sin(rocket.angle) * world.thrustPower * dt;
-      const ay = -Math.cos(rocket.angle) * world.thrustPower * dt;
-      rocket.vx += ax;
-      rocket.vy += ay;
-      rocket.fuel = Math.max(0, rocket.fuel - world.fuelConsumption * dt * 0.02);
-    } else {
-      rocket.thrusting = false;
-    }
-
-    // Gravity (downward)
-    rocket.vy += world.gravity * dt;
-
-    // Integrate position
-    rocket.x += rocket.vx * dt;
-    rocket.y += rocket.vy * dt;
-
-    // Screen bounds (wrap horizontally)
-    if(rocket.x < -50) rocket.x = canvas.clientWidth + 50;
-    if(rocket.x > canvas.clientWidth + 50) rocket.x = -50;
-
-    // Ground collision
-    const groundY = canvas.clientHeight - world.groundHeight;
-    if(rocket.y + rocket.height/2 >= groundY) {
-      // land/crash check based on vertical speed and tilt
-      const vs = rocket.vy;
-      const tilt = Math.abs((rocket.angle % (Math.PI*2)));
-      const tiltDeg = Math.min(Math.abs((tilt > Math.PI ? tilt - Math.PI*2 : tilt)), Math.PI) * 180/Math.PI;
-      if(Math.abs(vs) < world.targetLandingSpeed && tiltDeg < 12 && Math.abs(rocket.vx) < 0.2) {
-        rocket.landed = true;
-        rocket.y = groundY - rocket.height/2;
-        rocket.vx = rocket.vy = 0;
-        showMessage('LANDED — Nice!');
-      } else {
-        rocket.crashed = true;
-        rocket.y = groundY - rocket.height/2;
-        rocket.vx = rocket.vy = 0;
-        showMessage('CRASHED');
-      }
-    }
-
-    // If out of fuel and falling fast, auto-deploy parachute (simple)
-    if(!rocket.parachute && rocket.fuel <= 0 && rocket.vy > 0.6 && rocket.y > canvas.clientHeight*0.4) {
-      rocket.parachute = true;
-      showMessage('PARACHUTE DEPLOYED',1200);
-    }
-
-    // parachute reduces downward velocity
-    if(rocket.parachute && !rocket.landed) {
-      rocket.vy *= 0.995; // dampen descent
-      rocket.vx *= 0.998;
-    }
-
-    // Update HUD elements
-    altEl.textContent = Math.max(0, Math.round((canvas.clientHeight - world.groundHeight - (rocket.y + rocket.height/2)) )) + ' m';
-    vyEl.textContent = rocket.vy.toFixed(2) + ' m/s';
-    vxEl.textContent = rocket.vx.toFixed(2) + ' m/s';
-    fuelEl.textContent = Math.round(rocket.fuel) + '%';
-    angleEl.textContent = (rocket.angle * 180/Math.PI).toFixed(0) + '°';
-  }
-
-  // Drawing
-  function draw() {
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-    ctx.clearRect(0,0,w,h);
-
-    // Sky gradient (redraw background slightly)
-    const g = ctx.createLinearGradient(0,0,0,h);
-    const theme = document.body.getAttribute('data-theme') === 'dark';
-    g.addColorStop(0, theme ? '#031627' : '#87cefa');
-    g.addColorStop(1, theme ? '#041a2f' : '#5bb0ff');
+  function drawBackground() {
+    // Sky color changes with altitude
+    let progress = Math.min(1, rocket.y / canvas.height);
+    let g = ctx.createLinearGradient(0,0,0,canvas.height);
+    g.addColorStop(0, progress > 0.5 ? "#000010" : "#87cefa");
+    g.addColorStop(1, "#001d3d");
     ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    // Stars for dark theme
-    if(theme) {
-      ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      for(let i=0;i<60;i++){
-        const sx = (i*37)%w;
-        const sy = ((i*73)%h)*0.7;
-        ctx.fillRect(sx,sy,1,1);
-      }
+    // Show stars above certain altitude
+    if(rocket.y < canvas.height/2){
+      ctx.fillStyle="white";
+      stars.forEach(s=>{
+        ctx.fillRect(s.x,s.y,2,2);
+      });
     }
+  }
 
-    // Ground
-    const groundY = h - world.groundHeight;
-    ctx.fillStyle = '#2b8f3a';
-    ctx.fillRect(0, groundY, w, world.groundHeight);
-
-    // Render rocket
+  function drawRocket() {
     ctx.save();
     ctx.translate(rocket.x, rocket.y);
-    ctx.rotate(rocket.angle);
-
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.12)';
-    ctx.beginPath();
-    ctx.ellipse(0, rocket.height/2 + 12, rocket.width*0.9, 8, 0, 0, Math.PI*2);
-    ctx.fill();
 
     // Body
-    ctx.fillStyle = '#ddd';
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-rocket.width/2, -rocket.height/2+4);
-    ctx.quadraticCurveTo(0, -rocket.height/2-12, rocket.width/2, -rocket.height/2+4);
-    ctx.lineTo(rocket.width/2, rocket.height/2-6);
-    ctx.quadraticCurveTo(0, rocket.height/2+6, -rocket.width/2, rocket.height/2-6);
-    ctx.closePath();
-    ctx.fill(); ctx.stroke();
+    ctx.fillStyle="silver";
+    ctx.fillRect(-10,-40,20,40);
 
-    // Fins
-    ctx.fillStyle = '#c44';
+    // Nose cone
     ctx.beginPath();
-    ctx.moveTo(-rocket.width/2, rocket.height/6);
-    ctx.lineTo(-rocket.width*1.6, rocket.height*0.85);
-    ctx.lineTo(-rocket.width/2, rocket.height/2-6);
+    ctx.moveTo(-10,-40);
+    ctx.lineTo(0,-60);
+    ctx.lineTo(10,-40);
     ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(rocket.width/2, rocket.height/6);
-    ctx.lineTo(rocket.width*1.6, rocket.height*0.85);
-    ctx.lineTo(rocket.width/2, rocket.height/2-6);
-    ctx.closePath();
+    ctx.fillStyle="red";
     ctx.fill();
 
-    // Window
-    ctx.fillStyle = '#0c2340';
-    ctx.beginPath();
-    ctx.arc(0, -6, 5, 0, Math.PI*2);
-    ctx.fill();
-
-    // Flames when thrusting
-    if(rocket.thrusting && rocket.fuel > 0 && !rocket.crashed && !rocket.landed) {
-      const flameLen = 18 + Math.random()*8;
-      const grad = ctx.createLinearGradient(0, rocket.height/2, 0, rocket.height/2 + flameLen);
-      grad.addColorStop(0, '#fff09a');
-      grad.addColorStop(0.4, '#ff8c2b');
-      grad.addColorStop(1, 'rgba(255,80,20,0.05)');
-      ctx.fillStyle = grad;
+    // Flames
+    if(rocket.thrust && rocket.fuel>0){
+      let flameLen = 20 + Math.random()*20;
+      let grad = ctx.createLinearGradient(0,0,0,flameLen);
+      grad.addColorStop(0,"white");
+      grad.addColorStop(0.4,"orange");
+      grad.addColorStop(1,"rgba(255,0,0,0)");
+      ctx.fillStyle=grad;
       ctx.beginPath();
-      ctx.moveTo(-6, rocket.height/2 - 2);
-      ctx.quadraticCurveTo(0, rocket.height/2 + flameLen + Math.random()*6, 6, rocket.height/2 - 2);
+      ctx.moveTo(-8,0);
+      ctx.lineTo(0,flameLen);
+      ctx.lineTo(8,0);
       ctx.closePath();
       ctx.fill();
+
+      // Smoke particles
+      particles.push({x:rocket.x+(Math.random()*20-10),y:rocket.y+20,alpha:1});
     }
 
-    // Parachute
-    if(rocket.parachute) {
-      ctx.restore();
-      ctx.save();
-      ctx.translate(rocket.x, rocket.y - rocket.height/2 - 18);
-      ctx.fillStyle = '#ff6f61';
-      ctx.beginPath();
-      ctx.arc(0,0,28,Math.PI,2*Math.PI);
-      ctx.lineTo(-30,0);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle='#8a2b2b';
-      ctx.stroke();
-      // Lines
-      ctx.strokeStyle='rgba(0,0,0,0.2)';
-      ctx.beginPath();
-      ctx.moveTo(-20,0); ctx.lineTo(rocket.x - rocket.x, rocket.height/2 + 6);
-      ctx.moveTo(20,0); ctx.lineTo(rocket.x - rocket.x, rocket.height/2 + 6);
-      ctx.stroke();
-    }
     ctx.restore();
-
-    // HUD overlay text
-    if(!running) {
-      ctx.fillStyle = 'rgba(0,0,0,0.25)';
-      ctx.fillRect(0,0,w,h);
-      ctx.fillStyle = 'white';
-      ctx.font = '28px system-ui,Segoe UI,Arial';
-      ctx.textAlign='center';
-      ctx.fillText('PAUSED', w/2, h/2 - 20);
-    }
   }
 
-  // Main loop
-  function loop(ts) {
-    if(!lastTime) lastTime = ts;
-    const dt = Math.min(40, ts - lastTime); // clamp to avoid big jumps (ms)
-    lastTime = ts;
+  function drawParticles() {
+    particles.forEach((p,i)=>{
+      ctx.fillStyle=`rgba(200,200,200,${p.alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,8,0,Math.PI*2);
+      ctx.fill();
+      p.y+=1;
+      p.alpha-=0.01;
+      if(p.alpha<=0) particles.splice(i,1);
+    });
+  }
 
+  function update(dt) {
+    if(!running) return;
+    if(rocket.fuel>0 && rocket.thrust){
+      rocket.vy -= 0.02*dt;
+      rocket.fuel-=0.02*dt;
+    }
+    rocket.vy+=0.01*dt; // gravity
+    rocket.y+=rocket.vy;
+    if(rocket.y>canvas.height-100) rocket.y=canvas.height-100;
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawBackground();
+    drawParticles();
+    drawRocket();
+  }
+
+  function loop(ts) {
+    if(!lastTime) lastTime=ts;
+    let dt = ts-lastTime; lastTime=ts;
     update(dt);
     draw();
-
-    if(running) requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
   }
 
-  // Initialize
-  resize();
-  reset();
+  function startLaunch(){
+    let count=3;
+    countdownEl.style.display="block";
+    countdownEl.textContent=count;
+    let timer=setInterval(()=>{
+      count--;
+      if(count>0){
+        countdownEl.textContent=count;
+      } else {
+        clearInterval(timer);
+        countdownEl.textContent="LIFT OFF!";
+        setTimeout(()=>countdownEl.style.display="none",1000);
+        running=true;
+        rocket.thrust=true;
+      }
+    },1000);
+  }
+
+  // Start automatically
+  startLaunch();
   requestAnimationFrame(loop);
-
-  // Expose for quick debugging in console
-  window.__rocket = rocket;
-
 })();
 </script>
 </body>
 </html>
-
-

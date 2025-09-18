@@ -1,0 +1,28 @@
+:root{
+  --bg:#000;
+  --space: radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 40%, transparent 70%);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+body{background:var(--bg);background-image:var(--space);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem}
+.controls{position:fixed;top:12px;left:12px;display:flex;gap:.5rem;align-items:center;z-index:40}
+.controls button{padding:.4rem .6rem;border-radius:6px;border:0;background:rgba(255,255,255,0.06);color:white}
+.controls input{width:120px}
+.scene{width:min(1000px,95vw);height:min(800px,80vh);position:relative;display:grid;place-items:center}
+.sun{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #fff2a8 0%, #ffb84d 20%, #ff7a00 55%, #cc4c00 100%);box-shadow:0 0 80px 20px rgba(255,140,0,0.25), inset 0 -10px 30px rgba(0,0,0,0.15);z-index:10}
+.orbits{position:absolute;inset:0;display:block}
+.orbit{position:absolute;left:50%;top:50%;transform-origin:center center;}
+.orbit .track{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1px dashed rgba(255,255,255,0.06)}
+.orbit .planet{position:absolute;top:50%;left:50%;transform-origin:-50%  -50%;border-radius:50%;box-shadow:0 6px 12px rgba(0,0,0,0.4)}
+
+/* animation */
+@keyframes orbit-rotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.orbit.rotate{animation-timing-function:linear;animation-iteration-count:infinite;animation-name:orbit-rotate}
+
+/* Responsive tweaks */
+@media (max-width:600px){
+  .sun{width:72px;height:72px}
+}
+
+/* simple credit */
+.credit{position:fixed;right:12px;bottom:12px;font-size:12px;opacity:0.7}

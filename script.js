@@ -1,4 +1,4 @@
-// ===== SETUP SCENE =====
+// ===== SETUP SCENE ===== 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(
   75,
@@ -67,16 +67,14 @@ animate();
 // ===== MISSIONS =====
 function startMission(type) {
   if (type === "satellite") {
-    alert("🛰 Satellite Launch: Place a satellite into Earth's orbit!");
-    rocket.position.y = 5;
+    window.location.href = "satellite.html"; // new page
   } else if (type === "moon") {
     alert("🌙 Moon Mission: Reach the Moon!");
     rocket.position.y = 10;
-  } else if (type === "mars") {
+  } else if (type === "mars") { 
     alert("🔴 Mars Mission: Travel to the Red Planet!");
     rocket.position.y = 15;
   } else if (type === "zodiac") {
-    alert("✨ Zodiac Mission: Unlock your zodiac planet!");
-    rocket.position.y = 20;
+    window.location.href = "zodiac.html"; // open zodiac page
   }
 }

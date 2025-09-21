@@ -67,8 +67,25 @@
     },
   ];
 
+  // Object for sun details
+  const sunDetails = {
+    name: "Sun",
+    funFact: "The sun is so big that about one million Earths could fit inside it!",
+    color: "yellow",
+  };
+
   const orbitsEl = document.getElementById("orbits");
   const detailsEl = document.getElementById("planet-details");
+  const sunEl = document.getElementById("sun");
+
+  // Add click event listener to the sun
+  sunEl.addEventListener("click", () => {
+    detailsEl.innerHTML = `
+      <h2 style="color: ${sunDetails.color};">${sunDetails.name}</h2>
+      <h3>Fun Fact:</h3>
+      <p>${sunDetails.funFact}</p>
+    `;
+  });
 
   // create orbit elements
   planets.forEach((p, i) => {
@@ -99,7 +116,8 @@
     planet.title = p.name;
     planet.setAttribute("aria-label", p.name);
     // place planet at right-most edge of orbit using transform translate
-    const planetSize = Math.max(4, p.size);
+    // Increased minimum size to 8px to make smaller planets easier to click
+    const planetSize = Math.max(8, p.size);
     planet.style.width = planetSize + "px";
     planet.style.height = planetSize + "px";
     planet.style.background = p.color;
@@ -170,3 +188,7 @@
     toggle.textContent = "Animation disabled";
   }
 })();
+
+For app.js file.. 
+
+Jokhun somay pash run kore dekhenish

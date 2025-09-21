@@ -1,10 +1,45 @@
 (function () {
   const planets = [
-    { name: "Mercury", size: 6, color: "#bdbdbd", distance: 80, period: 4.8 },
-    { name: "Venus", size: 10, color: "#e0c27a", distance: 110, period: 12.2 },
-    { name: "Earth", size: 11, color: "#4a90e2", distance: 150, period: 16 },
-    { name: "Mars", size: 8, color: "#c84a3a", distance: 190, period: 30 },
-    { name: "Jupiter", size: 22, color: "#d6a37a", distance: 260, period: 120 },
+    {
+      name: "Mercury",
+      size: 6,
+      color: "#bdbdbd",
+      distance: 80,
+      period: 4.8,
+      funFact: "A year on Mercury is just 88 Earth days long!",
+    },
+    {
+      name: "Venus",
+      size: 10,
+      color: "#e0c27a",
+      distance: 110,
+      period: 12.2,
+      funFact: "Venus rotates backward compared to most other planets.",
+    },
+    {
+      name: "Earth",
+      size: 11,
+      color: "#4a90e2",
+      distance: 150,
+      period: 16,
+      funFact: "Earth is the only planet not named after a Roman god or goddess.",
+    },
+    {
+      name: "Mars",
+      size: 8,
+      color: "#c84a3a",
+      distance: 190,
+      period: 30,
+      funFact: "Mars has the tallest mountain in the solar system, Olympus Mons!",
+    },
+    {
+      name: "Jupiter",
+      size: 22,
+      color: "#d6a37a",
+      distance: 260,
+      period: 120,
+      funFact: "Jupiter's 'Great Red Spot' is a storm bigger than Earth.",
+    },
     {
       name: "Saturn",
       size: 18,
@@ -12,12 +47,28 @@
       distance: 340,
       period: 220,
       ring: true,
+      funFact: "Saturn's rings are made of ice, rocks, and dust.",
     },
-    { name: "Uranus", size: 14, color: "#9fe0e8", distance: 420, period: 480 },
-    { name: "Neptune", size: 14, color: "#4b6fff", distance: 480, period: 800 },
+    {
+      name: "Uranus",
+      size: 14,
+      color: "#9fe0e8",
+      distance: 420,
+      period: 480,
+      funFact: "Uranus rotates on its side, like a rolling ball!",
+    },
+    {
+      name: "Neptune",
+      size: 14,
+      color: "#4b6fff",
+      distance: 480,
+      period: 800,
+      funFact: "Neptune's winds are the fastest in the solar system.",
+    },
   ];
 
   const orbitsEl = document.getElementById("orbits");
+  const detailsEl = document.getElementById("planet-details");
 
   // create orbit elements
   planets.forEach((p, i) => {
@@ -53,6 +104,19 @@
     planet.style.height = planetSize + "px";
     planet.style.background = p.color;
     planet.style.transform = `translate(${p.distance}px, -50%)`;
+
+    // Add click event listener to the planet
+    planet.addEventListener("click", () => {
+      detailsEl.innerHTML = `
+        <h2 style="color: ${p.color};">${p.name}</h2>
+        <p>Size: ${p.size}</p>
+        <p>Distance from Sun: ${p.distance} million km</p>
+        <p>Orbital Period: ${p.period} Earth days</p>
+        <br>
+        <h3>Fun Fact:</h3>
+        <p>${p.funFact}</p>
+      `;
+    });
 
     // ring for Saturn
     if (p.ring) {

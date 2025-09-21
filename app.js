@@ -189,6 +189,5 @@
   }
 })();
 
-For app.js file.. 
 
-Jokhun somay pash run kore dekhenish
+

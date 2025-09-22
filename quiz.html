@@ -4,13 +4,6 @@
   <meta charset="UTF-8">
   <title>Space Quiz</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .badge {
-      font-size: 40px;
-      margin-top: 20px;
-      text-shadow: 0 0 10px gold, 0 0 20px gold;
-    }
-  </style>
 </head>
 <body>
   <header>
@@ -22,102 +15,27 @@
   </header>
 
   <main>
-    <h2 id="level-title">Level 1: Beginner</h2>
+    <h2>Test Your Space Knowledge!</h2>
     <div id="quiz-container">
       <p id="question">Loading question...</p>
       <div id="options"></div>
       <button onclick="nextQuestion()">Next</button>
       <p id="result"></p>
     </div>
+
+    <!-- Profile Achievements -->
+    <section id="profile">
+      <h2>👩‍🚀 Your Profile Achievements</h2>
+      <div id="badges">
+        <!-- Badges will appear here dynamically -->
+      </div>
+    </section>
   </main>
 
   <footer>
     <p>🚀 Good Luck, Young Astronaut!</p>
   </footer>
 
-  <script>
-    // ===== Question Sets =====
-    const levels = {
-      1: [
-        { question: "Which planet is called the Red Planet?", options: ["Earth", "Mars", "Jupiter", "Venus"], answer: "Mars" },
-        { question: "Which is the largest planet in our solar system?", options: ["Saturn", "Jupiter", "Neptune", "Earth"], answer: "Jupiter" },
-        { question: "Who was the first person to walk on the Moon?", options: ["Yuri Gagarin", "Buzz Aldrin", "Neil Armstrong", "Kalpana Chawla"], answer: "Neil Armstrong" }
-      ],
-      2: [
-        { question: "What is the hottest planet in our Solar System?", options: ["Mercury", "Venus", "Mars", "Jupiter"], answer: "Venus" },
-        { question: "What is the name of India’s first satellite?", options: ["Aryabhata", "Chandrayaan", "Mangalyaan", "INSAT"], answer: "Aryabhata" },
-        { question: "Which planet has the most moons?", options: ["Saturn", "Jupiter", "Neptune", "Earth"], answer: "Saturn" }
-      ],
-      3: [
-        { question: "What is the name of a space object so strong that not even light can escape?", options: ["Supernova", "Black Hole", "Galaxy", "Neutron Star"], answer: "Black Hole" },
-        { question: "What is the boundary around a black hole called?", options: ["Singularity", "Event Horizon", "Asteroid Belt", "Dark Zone"], answer: "Event Horizon" },
-        { question: "Which galaxy do we live in?", options: ["Andromeda", "Sombrero", "Whirlpool", "Milky Way"], answer: "Milky Way" }
-      ]
-    };
-
-    let currentLevel = 1;
-    let currentQuestion = 0;
-    let score = 0;
-
-    function loadQuestion() {
-      let q = levels[currentLevel][currentQuestion];
-      document.getElementById("question").textContent = q.question;
-      let optionsHTML = "";
-      q.options.forEach(opt => {
-        optionsHTML += `<button onclick="checkAnswer('${opt}')">${opt}</button>`;
-      });
-      document.getElementById("options").innerHTML = optionsHTML;
-    }
-
-    function checkAnswer(selected) {
-      let result = document.getElementById("result");
-      if (selected === levels[currentLevel][currentQuestion].answer) {
-        score++;
-        result.textContent = "✅ Correct!";
-      } else {
-        result.textContent = "❌ Wrong! The correct answer is " + levels[currentLevel][currentQuestion].answer;
-      }
-    }
-
-    function nextQuestion() {
-      currentQuestion++;
-      document.getElementById("result").textContent = "";
-      if (currentQuestion < levels[currentLevel].length) {
-        loadQuestion();
-      } else {
-        // End of level
-        endLevel();
-      }
-    }
-
-    function endLevel() {
-      let quizContainer = document.getElementById("quiz-container");
-      if (score === levels[currentLevel].length) {
-        if (currentLevel === 1) {
-          quizContainer.innerHTML = `<h3>🎉 You scored ${score}/${levels[currentLevel].length}! 🥉 Bronze Badge Earned!</h3>`;
-          currentLevel++;
-          setTimeout(startNextLevel, 2000);
-        } else if (currentLevel === 2) {
-          quizContainer.innerHTML = `<h3>🎉 Perfect Score! 🥈 Silver Badge Earned!</h3>`;
-          currentLevel++;
-          setTimeout(startNextLevel, 2000);
-        } else if (currentLevel === 3) {
-          quizContainer.innerHTML = `<h3>🌟 Outstanding! You scored full in all levels! 🥇 Golden Badge Earned! 🌟</h3><div class="badge">🏆</div>`;
-        }
-      } else {
-        quizContainer.innerHTML = `<h3>😢 You scored ${score}/${levels[currentLevel].length}. Try again!</h3>`;
-      }
-    }
-
-    function startNextLevel() {
-      score = 0;
-      currentQuestion = 0;
-      document.getElementById("level-title").textContent = `Level ${currentLevel}: ${currentLevel === 2 ? "Intermediate" : "Expert"}`;
-      loadQuestion();
-    }
-
-    // Start quiz
-    loadQuestion();
-  </script>
+  <script src="quiz.js"></script>
 </body>
 </html>

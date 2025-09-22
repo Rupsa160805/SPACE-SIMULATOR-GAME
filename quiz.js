@@ -58,13 +58,22 @@ const quizLevels = [
   ]
 ];
 
+// ===== STATE =====
 let currentLevel = 0;
 let currentQuestion = 0;
 let score = 0;
 
+// ===== BADGES =====
+const badges = {
+  bronze: "🥉 Bronze Badge",
+  silver: "🥈 Silver Badge",
+  gold: "🏆 Golden Badge"
+};
+
+// ===== LOAD QUESTION =====
 function loadQuestion() {
   let q = quizLevels[currentLevel][currentQuestion];
-  document.getElementById("question").textContent = q.question;
+  document.getElementById("question").textContent = `Level ${currentLevel + 1}: ${q.question}`;
 
   let optionsHTML = "";
   q.options.forEach(opt => {
@@ -73,6 +82,7 @@ function loadQuestion() {
   document.getElementById("options").innerHTML = optionsHTML;
 }
 
+// ===== CHECK ANSWER =====
 function checkAnswer(selected) {
   let result = document.getElementById("result");
   if (selected === quizLevels[currentLevel][currentQuestion].answer) {
@@ -83,6 +93,7 @@ function checkAnswer(selected) {
   }
 }
 
+// ===== NEXT QUESTION =====
 function nextQuestion() {
   currentQuestion++;
   document.getElementById("result").textContent = "";
@@ -94,22 +105,32 @@ function nextQuestion() {
   }
 }
 
+// ===== LEVEL COMPLETION =====
 function checkLevelCompletion() {
   if (score === quizLevels[currentLevel].length) {
-    // Full score → Award badge & advance
+    // Earn badge
     if (currentLevel === 0) {
-      document.getElementById("quiz-container").innerHTML = `<h3>🎉 Level 1 Complete! 🥉 You earned a Bronze Badge!</h3><button onclick="nextLevel()">Go to Level 2 🚀</button>`;
+      addBadge(badges.bronze);
+      alert("🎉 Level 1 Complete! You earned a Bronze Badge!");
+      nextLevel();
     } else if (currentLevel === 1) {
-      document.getElementById("quiz-container").innerHTML = `<h3>🎉 Level 2 Complete! 🥈 You earned a Silver Badge!</h3><button onclick="nextLevel()">Go to Level 3 🌌</button>`;
+      addBadge(badges.silver);
+      alert("🎉 Level 2 Complete! You earned a Silver Badge!");
+      nextLevel();
     } else if (currentLevel === 2) {
-      document.getElementById("quiz-container").innerHTML = `<h3>🏆 Congratulations! You completed all Levels and earned the Golden Badge! 🌟</h3>`;
+      addBadge(badges.gold);
+      alert("🏆 Congratulations! You completed all Levels and earned the Golden Badge!");
+      document.getElementById("quiz-container").innerHTML =
+        `<h3>🌟 All Levels Complete! 🌟</h3><p>Check your profile for badges!</p>`;
     }
   } else {
-    // Not full score → Fail
-    document.getElementById("quiz-container").innerHTML = `<h3>😢 You scored ${score}/${quizLevels[currentLevel].length}. Try Again!</h3><button onclick="restartQuiz()">Restart 🔄</button>`;
+    // Not full score → Restart quiz
+    alert(`😢 You scored ${score}/${quizLevels[currentLevel].length}. Try Again!`);
+    restartQuiz();
   }
 }
 
+// ===== NEXT LEVEL =====
 function nextLevel() {
   currentLevel++;
   currentQuestion = 0;
@@ -117,12 +138,27 @@ function nextLevel() {
   loadQuestion();
 }
 
+// ===== RESTART QUIZ =====
 function restartQuiz() {
   currentLevel = 0;
   currentQuestion = 0;
   score = 0;
+  document.getElementById("quiz-container").innerHTML = `
+    <p id="question">Loading question...</p>
+    <div id="options"></div>
+    <button onclick="nextQuestion()">Next</button>
+    <p id="result"></p>
+  `;
   loadQuestion();
 }
 
-// Start Quiz
+// ===== ADD BADGE TO PROFILE =====
+function addBadge(badgeText) {
+  let badgeDiv = document.getElementById("badges");
+  let badge = document.createElement("p");
+  badge.textContent = badgeText;
+  badgeDiv.appendChild(badge);
+}
+
+// ===== START QUIZ =====
 loadQuestion();

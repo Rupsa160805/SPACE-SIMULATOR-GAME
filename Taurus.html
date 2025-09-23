@@ -4,29 +4,83 @@
   <meta charset="UTF-8">
   <title>♉ Taurus - Zodiac Mission</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #0b0c10, #1f2833);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    .controls {
+      text-align: left;
+      margin: 15px;
+    }
+    .controls button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #45a29e;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    main {
+      margin-top: 30px;
+    }
+    main img {
+      width: 150px;
+      height: 150px;
+      margin: 20px 0;
+    }
+    button.play-btn {
+      margin-top: 15px;
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #66fcf1;
+      border: none;
+      color: #000;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    footer {
+      margin-top: 40px;
+      background: #0b0c10;
+      padding: 15px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-   <div class="controls">
-    <button onclick="location.href='zodiac.html'">Back</button>
-    </div>
-  <header>
-   <h1>♉ Taurus </h1>
-  </header>
+  <!-- Navigation Back Button -->
+  <div class="controls">
+    <button onclick="location.href='zodiac.html'">← Back</button>
+  </div>
+
+  <!-- Main Content -->
   <main>
-    <p>Taurus (April 20 – May 20) – Patient and reliable, loves comfort and stability.</p>
-     <button onclick="playAudio()">Play Aries Audio 🔊</button>
+    <h1>♉ Taurus</h1>
+    <img src="taurus.png" alt="Taurus Symbol">
+    <p><strong>Dates:</strong> April 20 – May 20</p>
+    <p><strong>Element:</strong> Earth 🌍</p>
+    <p><strong>Traits:</strong> Patient, reliable, practical, devoted, and loves comfort and stability.</p>
+    <p><strong>Fun Fact:</strong> Taurus is ruled by Venus, the planet of beauty and love, which makes them lovers of art, music, and luxury.</p>
+
+    <button class="play-btn" onclick="playAudio()">Play 🔊</button>
   </main>
 
+  <!-- Footer -->
   <footer>
     <p>© 2025 Space Mission Simulator. All Rights Reserved.</p>
   </footer>
 
+  <!-- Script -->
   <script>
     function playAudio() {
-      let audio = new Audio("Taurus.mp3");
+      let audio = new Audio("Taurus.mp3"); // put your Taurus.mp3 inside audio/ folder
       audio.play();
     }
   </script>
 </body>
 </html>
-

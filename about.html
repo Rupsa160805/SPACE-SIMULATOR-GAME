@@ -17,12 +17,36 @@
       background-color: yellow;
       border: 2px solid gold;
       border-radius: 10px;
-      padding: 20px;
+      padding: 10px;
       width: 250px;
       text-align: center;
       font-weight: bold;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .about-box .sub-box {
+      width: 90%;
+      background-color: #fff8dc;
+      border: 1px solid gold;
+      border-radius: 6px;
+      padding: 5px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: normal;
+      position: relative;
+    }
+
+    .about-box .sub-box::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 8px;
+      background-color: gold;
     }
 
     .about-box:hover {
@@ -47,12 +71,30 @@
     <p>We are passionate space enthusiasts building a fun and educational space simulator for kids and learners of all ages.</p>
 
     <div class="about-container">
-      <div class="about-box">🚀 Exploring Space</div>
-      <div class="about-box">🌌 Learning the Universe</div>
-      <div class="about-box">🛰️ Satellite Missions</div>
-      <div class="about-box">🔭 Astronomy Fun</div>
-      <div class="about-box">👩‍🚀 Kids-Friendly Games</div>
-      <div class="about-box">🌍 Inspiring Future Scientists</div>
+      <div class="about-box">
+        <div class="sub-box">🚀</div>
+        Exploring Space
+      </div>
+      <div class="about-box">
+        <div class="sub-box">🌌</div>
+        Learning the Universe
+      </div>
+      <div class="about-box">
+        <div class="sub-box">🛰️</div>
+        Satellite Missions
+      </div>
+      <div class="about-box">
+        <div class="sub-box">🔭</div>
+        Astronomy Fun
+      </div>
+      <div class="about-box">
+        <div class="sub-box">👩‍🚀</div>
+        Kids-Friendly Games
+      </div>
+      <div class="about-box">
+        <div class="sub-box">🌍</div>
+        Inspiring Future Scientists
+      </div>
     </div>
   </main>
 

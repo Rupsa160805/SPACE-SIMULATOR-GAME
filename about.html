@@ -3,8 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>About Us</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f4ff;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(to right, #4a00e0, #8e2de2);
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a.active {
+      text-decoration: underline;
+    }
+
+    main {
+      padding: 20px;
+      text-align: center;
+    }
+
     .about-container {
       display: flex;
       flex-wrap: wrap;
@@ -14,13 +44,14 @@
     }
 
     .about-box {
-      background-color: yellow;
-      border: 2px solid gold;
+      background-color: #1e3a8a; /* Blue */
+      border: 2px solid violet;
       border-radius: 10px;
       padding: 10px;
       width: 250px;
       text-align: center;
       font-weight: bold;
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -28,14 +59,15 @@
 
     .about-box .sub-box {
       width: 90%;
-      background-color: #fff8dc;
-      border: 1px solid gold;
+      background-color: #3b82f6;
+      border: 1px solid violet;
       border-radius: 6px;
       padding: 5px;
       margin-bottom: 10px;
       font-size: 14px;
       font-weight: normal;
       position: relative;
+      color: #fff;
     }
 
     .about-box .sub-box::after {
@@ -46,12 +78,20 @@
       transform: translateX(-50%);
       width: 2px;
       height: 8px;
-      background-color: gold;
+      background-color: violet;
     }
 
     .about-box:hover {
       transform: scale(1.05);
       box-shadow: 0px 6px 12px rgba(0,0,0,0.3);
+    }
+
+    footer {
+      background: #222;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>

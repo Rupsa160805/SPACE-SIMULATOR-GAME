@@ -51,9 +51,9 @@ const quizLevels = [
       answer: "Sagittarius A*"
     },
     {
-      question: "Which was the first spacecraft to land on the Moon?",
-      options: ["Apollo 11", "Luna 2", "Chandrayaan 1", "Vostok 1"],
-      answer: "Luna 2"
+      question: "Which planet is called Earth’s “twin” because of its size and structure?",
+      options: ["Venus", "Mars", "Neptune", "Saturn"],
+      answer: "Venus"
     }
   ]
 ];
@@ -162,3 +162,4 @@ function addBadge(badgeText) {
 
 // ===== START QUIZ =====
 loadQuestion();
+

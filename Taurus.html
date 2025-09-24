@@ -3,18 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <title>♉ Taurus - Zodiac Mission</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
     body {
-      <<header>
-  <h1 class="glitter-text">♉ Taurus</h1>
-</header>
-
       font-family: Arial, sans-serif;
       background: linear-gradient(to bottom, #0b0c10, #1f2833);
       color: #fff;
       margin: 0;
       padding: 0;
+    }
+
+    /* Glitter header */
+    header {
+      background: #0b0c10;
+      padding: 20px;
+      text-align: center;
+    }
+    .glitter-text {
+      font-size: 40px;
+      font-weight: bold;
+      background: linear-gradient(90deg, gold, orange, gold, yellow);
+      background-size: 200% auto;
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: shine 3s linear infinite;
+    }
+    @keyframes shine {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
     }
 
     .controls {
@@ -66,6 +82,9 @@
     .right {
       flex: 1;
       margin-left: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     /* Gold glitter flex text boxes */
@@ -78,6 +97,8 @@
       position: relative;
       box-shadow: 0 0 10px gold, 0 0 20px #ffec8b;
       animation: glitter 1.5s infinite alternate;
+      text-align: center;
+      font-size: 18px;
     }
 
     /* Small thin box connected on top with gold line */
@@ -110,6 +131,11 @@
   </style>
 </head>
 <body>
+  <!-- Glitter Header -->
+  <header>
+    <h1 class="glitter-text">♉ Taurus - Zodiac Mission</h1>
+  </header>
+
   <!-- Navigation Back Button -->
   <div class="controls">
     <button onclick="location.href='zodiac.html'">← Back</button>
@@ -141,16 +167,9 @@
   <!-- Script -->
   <script>
     function playAudio() {
-      let audio = new Audio("Taurus.mp3"); // put your Taurus.mp3 inside audio/ folder
+      let audio = new Audio("Taurus.mp3"); 
       audio.play();
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
-

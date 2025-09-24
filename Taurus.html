@@ -17,26 +17,48 @@
       background: #0b0c10;
       padding: 20px;
       text-align: center;
+      position: relative;
     }
+
     .glitter-text {
       font-size: 40px;
       font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
       background: linear-gradient(90deg, gold, orange, gold, yellow);
       background-size: 200% auto;
       color: transparent;
       background-clip: text;
       -webkit-background-clip: text;
-      animation: shine 3s linear infinite;
+      animation: shine 3s linear infinite, glow 2s ease-in-out infinite alternate;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8),
+                   0 0 20px rgba(255, 215, 0, 0.6),
+                   0 0 30px rgba(255, 165, 0, 0.6);
     }
+
+    .glitter-text img {
+      width: 60px;
+      height: 60px;
+    }
+
     @keyframes shine {
       0% { background-position: 0% 50%; }
       100% { background-position: 200% 50%; }
     }
 
-    .controls {
-      text-align: left;
-      margin: 15px;
+    @keyframes glow {
+      from { text-shadow: 0 0 10px gold, 0 0 20px orange; }
+      to { text-shadow: 0 0 20px yellow, 0 0 40px gold; }
     }
+
+    /* Back button at top-left */
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
     .controls button {
       padding: 10px 20px;
       font-size: 16px;
@@ -45,6 +67,7 @@
       border: none;
       cursor: pointer;
       border-radius: 5px;
+      box-shadow: 0 0 10px #45a29e, 0 0 20px #66fcf1;
     }
 
     /* Flex container for left-right layout */
@@ -133,19 +156,22 @@
 <body>
   <!-- Glitter Header -->
   <header>
-    <h1 class="glitter-text">♉ Taurus - Zodiac Mission</h1>
-  </header>
+    <!-- Back Button -->
+    <div class="controls">
+      <button onclick="location.href='zodiac.html'">← Back</button>
+    </div>
 
-  <!-- Navigation Back Button -->
-  <div class="controls">
-    <button onclick="location.href='zodiac.html'">← Back</button>
-  </div>
+    <!-- Header with glowing effect + symbol -->
+    <h1 class="glitter-text">
+      <img src="taurus.png" alt="Taurus Symbol"> ♉ Taurus - Zodiac Mission
+    </h1>
+  </header>
 
   <!-- Main Content -->
   <main class="content">
     <!-- Left Side -->
     <div class="left">
-      <img src="taurus.png" alt="Taurus Symbol">
+      <img src="taurus.png" alt="Taurus Symbol Large">
       <br>
       <button class="play-btn" onclick="playAudio()">Play 🔊</button>
     </div>

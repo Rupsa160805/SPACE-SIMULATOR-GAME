@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>♏ Scorpio - Zodiac Mission</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #0b0c10, #1f2833);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Glitter header */
+    header {
+      background: #0b0c10;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .glitter-text {
+      font-size: 40px;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      background: linear-gradient(90deg, gold, orange, gold, yellow);
+      background-size: 200% auto;
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: shine 3s linear infinite, glow 2s ease-in-out infinite alternate;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8),
+                   0 0 20px rgba(255, 215, 0, 0.6),
+                   0 0 30px rgba(255, 165, 0, 0.6);
+    }
+
+    .glitter-text img {
+      width: 60px;
+      height: 60px;
+    }
+
+    @keyframes shine {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px gold, 0 0 20px orange; }
+      to { text-shadow: 0 0 20px yellow, 0 0 40px gold; }
+    }
+
+    /* Back button at top-left */
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .controls button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #45a29e;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      box-shadow: 0 0 10px #45a29e, 0 0 20px #66fcf1;
+    }
+
+    /* Flex container for left-right layout */
+    .content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 30px;
+    }
+
+    /* Left side */
+    .left {
+      flex: 1;
+      text-align: center;
+    }
+    .left img {
+      width: 400px;
+      height: 500px;
+      margin-bottom: 20px;
+    }
+    button.play-btn {
+      margin-top: 15px;
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #ffd700;
+      border: none;
+      color: #000;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px #ffd700, 0 0 20px #ffec8b;
+    }
+
+    /* Right side */
+    .right {
+      flex: 1;
+      margin-left: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Gold glitter flex text boxes */
+    .box {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid gold;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      position: relative;
+      box-shadow: 0 0 10px gold, 0 0 20px #ffec8b;
+      animation: glitter 1.5s infinite alternate;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    /* Small thin box connected on top with gold line */
+    .box::before {
+      content: '';
+      width: 40px;
+      height: 10px;
+      background: gold;
+      display: block;
+      position: absolute;
+      top: -15px;
+      left: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px gold, 0 0 10px #ffec8b;
+    }
+
+    /* Glitter animation */
+    @keyframes glitter {
+      0% { box-shadow: 0 0 5px gold, 0 0 10px #ffec8b; }
+      100% { box-shadow: 0 0 20px gold, 0 0 30px #fff4b2; }
+    }
+
+    footer {
+      margin-top: 40px;
+      background: #0b0c10;
+      padding: 15px;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Glitter Header -->
+  <header>
+    <!-- Back Button -->
+    <div class="controls">
+      <button onclick="location.href='zodiac.html'">← Back</button>
+    </div>
+
+    <!-- Header with glowing effect + symbol -->
+    <h1 class="glitter-text">
+      ♏ SCORPIO
+    </h1>
+  </header>
+
+  <!-- Main Content -->
+  <main class="content">
+    <!-- Left Side -->
+    <div class="left">
+      <img src="scorpio.png" alt="Scorpio Symbol Large">
+      <br>
+      <button class="play-btn" onclick="playAudio()">Play 🔊</button>
+    </div>
+
+    <!-- Right Side -->
+    <div class="right">
+     <div class="box"><strong>Dates:</strong> October 23 – November 21</div>
+<div class="box"><strong>Element:</strong> Water 💧</div>
+<div class="box"><strong>Traits:</strong> Passionate, determined, mysterious, resourceful, and brave.</div>
+<div class="box"><strong>Fun Fact:</strong> Scorpios are known for their intensity and are ruled by Pluto, the planet of transformation.</div>
+
+
+
+
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Space Mission Simulator. All Rights Reserved.</p>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    function playAudio() {
+      let audio = new Audio("Scorpio.mp3"); 
+      audio.play();
+    }
+  </script>
+</body>
+</html>

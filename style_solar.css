@@ -1,0 +1,89 @@
+/* Basic reset */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000000;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Below the UI */
+}
+
+/* Position the label container on top of the canvas */
+#label-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allows clicks to pass through to the canvas */
+    z-index: 2; /* On top of the canvas */
+}
+
+/* Style for individual planet labels */
+.label {
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+/* UI Controls Styling */
+.controls-container {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 3; /* On top of everything */
+}
+
+#play-pause-btn, #back-btn {
+    padding: 8px 16px;
+    border: 1px solid #fff;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+#play-pause-btn:hover, #back-btn:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#speed-slider {
+    cursor: pointer;
+}
+
+#speed-value {
+    min-width: 40px;
+    font-weight: bold;
+}
+
+/* Utility class to hide elements */
+.hidden {
+    display: none !important;
+}

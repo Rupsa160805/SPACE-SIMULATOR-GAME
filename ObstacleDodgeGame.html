@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Cosmic Voyager</title>
+    <title>OBSTACLE DODGE GAME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
@@ -244,8 +244,8 @@
             animation: flicker-effect 0.15s infinite;
         }
         @keyframes flicker-effect {
-             0%, 100% { opacity: 1; }
-             50% { opacity: 0.3; }
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.3; }
         }
     </style>
 </head>
@@ -309,22 +309,22 @@
         </div>
     </div>
     <div id="game-over-screen" class="modal-bg hidden">
-           <div class="modal-content">
-                <h2 id="game-over-title">Mission Failed!</h2>
-                <p id="final-distance">You traveled 0 km.</p>
-                <p id="game-over-high-score" style="font-size: 1.25rem; color: #f6e05e;">High Score: 0 km</p>
-                <button id="restart-button">Play Again</button>
-            </div>
+         <div class="modal-content">
+            <h2 id="game-over-title">Mission Failed!</h2>
+            <p id="final-distance">You traveled 0 km.</p>
+            <p id="game-over-high-score" style="font-size: 1.25rem; color: #f6e05e;">High Score: 0 km</p>
+            <button id="restart-button">Play Again</button>
+        </div>
     </div>
      <div id="mission-screen" class="modal-bg hidden">
-           <div class="modal-content">
-                <h2 id="mission-title"></h2>
-                <p id="mission-text"></p>
-                <div id="mission-buttons" style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
-                    <button id="exit-button" style="background-color: #a0aec0; box-shadow: 0 4px #4a5568; color: #1a202c;">Exit to Menu</button>
-                    <button id="continue-button">Continue Voyage</button>
-                </div>
+         <div class="modal-content">
+            <h2 id="mission-title"></h2>
+            <p id="mission-text"></p>
+            <div id="mission-buttons" style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                <button id="exit-button" style="background-color: #a0aec0; box-shadow: 0 4px #4a5568; color: #1a202c;">Exit to Menu</button>
+                <button id="continue-button">Continue Voyage</button>
             </div>
+        </div>
     </div>
     <div id="popup-container" class="modal-bg hidden" style="background: transparent; pointer-events:none;">
         <div id="popup-text" class="popup-text"></div>
@@ -561,7 +561,7 @@
                 } else if (roll < eventChance * 0.6) {
                     setTimeout(() => triggerEvent('NEBULA', 1500), 2500);
                 } else if (roll < eventChance * 0.8) {
-                    setTimeout(() => triggerEvent('WORMHOLE', 'skip'), 3000);
+                     setTimeout(() => triggerEvent('WORMHOLE', 'skip'), 3000);
                 } else if (roll < eventChance) {
                     setTimeout(() => triggerTimingGame(), 1500);
                 }
@@ -610,7 +610,6 @@
                 blackHoleRotation += 0.01;
                 
                 if (eventState.gracePeriod <= 0) {
-                    // Pull the player towards the center (left in this setup)
                     player.x -= gameDifficultySettings.blackHolePull;
                 }
                 
@@ -623,486 +622,1029 @@
                     }
                 }
 
-                if (keys.q) { 
-                    // Mash Q to escape (move right)
-                    player.x += 8; 
-                    if(synths.thrust) synths.thrust.triggerAttackRelease("C3", "32n");
-                } 
+                if (keys.q) { player.x += 8; } 
 
-                // Check for failure (player gets too close to the black hole's event horizon)
                 if (eventState.gracePeriod <= 0 && player.x < eventState.hole.x + eventState.hole.radius * 0.6) { 
                     endGame("Consumed by a black hole!"); 
                     return; 
                 }
-                // Check for success (player escapes to the right side of the screen)
                 if (player.x > canvas.width + 50) {
                     succeedBlackHoleEvent();
                     return;
                 }
             } else {
-                // Regular flying mode: player is locked to the left side
-                player.x = 100;
+                 player.x = 100;
             }
-            
-            // ... (rest of the updateFlying function) ...
             
             if (keys.up) player.vy -= player.ay; else if (keys.down) player.vy += player.ay;
             player.vy *= player.friction;
             if (Math.abs(player.vy) > player.maxVy) player.vy = Math.sign(player.vy) * player.maxVy;
             player.y += player.vy;
-
-            // Collision with boundaries
             if (player.y < 0) { player.y = 0; player.vy = 0; }
             if (player.y + player.height > canvas.height) { player.y = canvas.height - player.height; player.vy = 0; }
 
-            // Fuel/Boost/Shield Logic
-            boosting = keys.shift && player.fuel > 0;
-            shieldActive = keys.shield || shieldTimer > 0;
-            if (boosting) {
-                player.fuel -= gameDifficultySettings.fuelDrainRate;
-                distance += 5; 
-                if (synths.boost) synths.boost.volume.value = 0; 
-            } else {
-                distance += 2;
-                if (synths.boost) synths.boost.volume.value = -Infinity;
+            let isCurrentlyBoosting = false;
+            if (boostTimer > 0) { isCurrentlyBoosting = true; boostTimer--; } 
+            else if (keys.shift && player.fuel > 0 && !(eventState.active && eventState.type === 'BLACK_HOLE')) { isCurrentlyBoosting = true; player.fuel -= gameDifficultySettings.fuelDrainRate; }
+            boosting = isCurrentlyBoosting;
+            
+            shieldActive = (keys.shield && player.fuel > 0) || shieldTimer > 0;
+            if (shieldActive) {
+                if (shieldTimer > 0) {
+                    shieldTimer--;
+                } else {
+                    player.fuel -= gameDifficultySettings.shieldDrainRate;
+                    if(player.fuel <= 0) { player.fuel = 0; shieldActive = false; keys.shield = false; }
+                }
             }
-            if (shieldActive && player.fuel > 0 && shieldTimer <= 0) { player.fuel -= gameDifficultySettings.shieldDrainRate; }
-            if (shieldTimer > 0) shieldTimer--;
-            if (player.fuel < 0) { player.fuel = 0; boosting = false; shieldActive = false; keys.shift = false; keys.shield = false; }
             fuelBar.style.width = `${player.fuel}%`;
+
+            updateStars(farStars); updateStars(midStars); updateStars(stars);
+            updatePlanets(); updateObstacles(); updateCollectibles(); updatePhantoms(); updateThrusters(); updateSceneryObjects();
+            detectCollisions();
             
-            distanceSinceLastEncounter += boosting ? 5 : 2;
-            distance += boosting ? 5 : 2;
-            distanceDisplay.textContent = `DISTANCE: ${Math.floor(distance / 100)} km`;
+            const speedIncrement = boosting ? 4 : 1;
+            if (!(eventState.active && eventState.type === 'BLACK_HOLE')) {
+                distance += speedIncrement;
+                distanceSinceLastEncounter += speedIncrement;
+            }
+
+            distanceDisplay.textContent = `DISTANCE: ${Math.floor(distance)} km`;
             empDisplay.textContent = `EMP: ${player.empCharges}`;
-
-
-            // Update Stars
-            updateStars(stars, boosting ? 8 : 4);
-            updateStars(midStars, boosting ? 5 : 2.5);
-            updateStars(farStars, boosting ? 2 : 1);
-
-            // Update Planets/Scenery
-            if (eventState.active && eventState.type === 'NEBULA') {
-                updateNebula();
-            } else {
-                updatePlanets();
-                updateScenery();
-            }
-
-            // Update Obstacles/Collectibles
-            if (!eventState.active || eventState.type === 'ASTEROID_BELT' || eventState.type === 'NEBULA') {
-                spawnObstacles();
-                spawnCollectibles();
-            }
-            updateObstacles(boosting ? 2 : 1);
-            updateCollectibles(boosting ? 2 : 1);
             
-            // Update EMP Blast
-            if (empBlast.active) {
-                empBlast.radius += 50;
-                if (empBlast.radius > empBlast.maxRadius) empBlast.active = false;
+            if(eventState.active){
+                eventState.duration -= 1;
+                if(eventState.duration <= 0){
+                    const lastEventType = eventState.type;
+                    eventState.active = false; 
+                    eventState.type = null;
+                    boosting = false; 
+                    player.x = 100;
+                    if(lastEventType === 'NEBULA' || lastEventType === 'ASTEROID_BELT') {
+                        if(eventState.flickerInterval) clearInterval(eventState.flickerInterval);
+                        eventState.flickerInterval = null;
+                        document.querySelectorAll('.flicker').forEach(el => el.classList.remove('flicker'));
+                        phantoms = [];
+                        showPopup("Anomaly Cleared!", false);
+                    }
+                    if(lastEventType === 'BLACK_HOLE') {
+                        endGame("Failed to escape the anomaly!");
+                    }
+                }
             }
+        }
 
-            // Player/Obstacle Collision
+        function drawFlying() {
+            ctx.save();
+            const isBlackHole = eventState.active && eventState.type === 'BLACK_HOLE';
+            const shakeMagnitude = isBlackHole ? Math.min(15, 300 / player.x) : (eventState.active && (eventState.type === 'NEBULA' || eventState.type === 'ASTEROID_BELT') ? 2 : 0);
+            if (shakeMagnitude > 0) { ctx.translate((Math.random() - 0.5) * shakeMagnitude, (Math.random() - 0.5) * shakeMagnitude); }
+
+            clear();
+            drawStars(farStars);
+            if (isBlackHole) drawBlackHole();
+            if (eventState.active && eventState.type === 'NEBULA') drawNebula();
+            drawStars(midStars); 
+            drawPlanets(); 
+            drawCollectibles(); drawPhantoms(); drawObstacles(); drawSceneryObjects();
+            drawPlayer(); 
+            drawThrusters(); drawShield();
+            drawStars(stars);
+            drawEMPBlast();
+            ctx.restore();
+        }
+
+        function drawNebula() { nebulaParticles.forEach(p => { p.x -= p.speed; if (p.x + p.radius < 0) { p.x = canvas.width + p.radius; } ctx.globalAlpha = 0.5; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1.0; }); }
+        
+        function succeedBlackHoleEvent() {
+            showPopup("Successful Escape!", false);
+            eventState.active = false;
+            eventState.type = null;
+            eventState.hole = null;
+            player.x = 100;
+        }
+
+        function drawBlackHole() {
+            if (!eventState.active || eventState.type !== 'BLACK_HOLE' || !eventState.hole) return;
+            const hole = eventState.hole; const centerX = hole.x; const centerY = hole.y;
+            ctx.save();
+            ctx.translate(centerX, centerY); ctx.rotate(blackHoleRotation);
+            const diskGradient = ctx.createRadialGradient(0, 0, hole.radius * 0.5, 0, 0, hole.radius * 1.5);
+            diskGradient.addColorStop(0, 'rgba(0, 0, 0, 0)'); diskGradient.addColorStop(0.6, '#4a00e0'); diskGradient.addColorStop(0.8, '#8e2de2'); diskGradient.addColorStop(1, 'rgba(100, 200, 255, 0.5)');
+            ctx.fillStyle = diskGradient; ctx.globalAlpha = 0.7; ctx.fillRect(-hole.radius * 2, -hole.radius * 2, hole.radius * 4, hole.radius * 4);
+            ctx.globalAlpha = 1.0; ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(0, 0, hole.radius * 0.7, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        function getPlanetRadius(planetName) { if (planetName === 'Sun') return 200; if (planetName === 'Jupiter') return 180; if (planetName === 'Saturn') return 160; return Math.random() * 80 + 60; }
+
+        function updatePlanets() {
+            if (gameState === GameState.HYPERDRIVE_ESCAPE) return;
+            const planetSpawnDistance = 3000;
+            let planetToSpawn = null; let isFlyby = false;
+            if (distanceSinceLastEncounter > planetSpawnDistance && planets.length < 1 && !eventState.active) {
+                if (flybyQueue.length > 0) { planetToSpawn = flybyQueue.shift(); isFlyby = true; } 
+                else if (!targetHasSpawned) { planetToSpawn = targetPlanetName; isFlyby = false; targetHasSpawned = true; }
+            }
+            if (planetToSpawn) {
+                distanceSinceLastEncounter = 0;
+                const radius = getPlanetRadius(planetToSpawn);
+                planets.push({ x: canvas.width + radius * 2, y: Math.random() * canvas.height, radius: radius, speed: Math.random() * 0.3 + 0.15, name: planetToSpawn, isFlyby: isFlyby });
+            }
+            planets.forEach((planet, index) => {
+                planet.x -= (boosting ? (planet.speed || 1) * 4 : (planet.speed || 1));
+                if (planet.x + (planet.radius * 2) < 0) { planets.splice(index, 1); }
+                if (!planet.approached && planet.x < canvas.width * 1.5) { planet.approached = true; showPopup(`Approaching ${planet.name}${planet.isFlyby ? ' (Fly-by)' : ''}...`, false); }
+                if (planet.approached && !planet.handled && planet.x < canvas.width / 2 + 200 && (gameState === GameState.FLYING || gameState === GameState.EVENT)) { planet.handled = true; triggerMinigame(planet); }
+            });
+        }
+        
+        function updateObstacles() {
+            let spawnRate = gameDifficultySettings.obstacleSpawnRate;
+            if (distance < 3000) { spawnRate *= 0.1; }
+            if (gameState === GameState.HYPERDRIVE_ESCAPE) spawnRate *= 5;
+            if (eventState.active && eventState.type === 'ASTEROID_BELT') spawnRate *= 5;
+            if (eventState.active && eventState.type === 'BLACK_HOLE') return;
+
+            if (Math.random() < spawnRate) {
+                const galaxyObstacles = GALAXY_ORDER[currentGalaxyIndex].obstacleTypes;
+                const type = galaxyObstacles[Math.floor(Math.random() * galaxyObstacles.length)];
+                obstacles.push({ size: Math.random() * 30 + 20, speed: (Math.random() * 2 + 1.5) * gameDifficultySettings.obstacleSpeedMultiplier, rotation: 0, rotationSpeed: type === 'crystal' ? 0 : (Math.random() - 0.5) * 0.05, shape: createAsteroidShape(1), type: type, x: canvas.width, y: Math.random() * canvas.height });
+            }
+            
+            obstacles = obstacles.filter(obstacle => {
+                obstacle.x -= (boosting ? obstacle.speed * 4 : obstacle.speed);
+                obstacle.rotation += obstacle.rotationSpeed;
+                return obstacle.x + obstacle.size > -50;
+            });
+        }
+
+        function updateSceneryObjects() {
+            sceneryObjects = sceneryObjects.filter(obj => {
+                // Let black hole logic handle movement if active
+                if (!eventState.active || eventState.type !== 'BLACK_HOLE') {
+                    obj.x -= (boosting ? obj.speed * 4 : obj.speed);
+                }
+                return obj.x + 50 > 0;
+            });
+        }
+
+        function drawSceneryObjects() {
+            sceneryObjects.forEach(obj => {
+                ctx.font = `${obj.size}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.save();
+                ctx.translate(obj.x, obj.y);
+                ctx.rotate(obj.rotation);
+                ctx.fillText(obj.emoji, 0, 0);
+                ctx.restore();
+            });
+        }
+
+        function updatePhantoms() { if (eventState.active && eventState.type === 'NEBULA' && Math.random() < 0.03) { const size = Math.random() * 40 + 25; phantoms.push({ x: canvas.width + size, y: Math.random() * (canvas.height - size), size: size, speed: Math.random() * 2 + 1, rotation: 0, rotationSpeed: (Math.random() - 0.5) * 0.02, shape: createAsteroidShape(size) }); } const livePhantoms = []; for(const p of phantoms) { p.x -= (boosting ? p.speed * 4 : p.speed); p.rotation += p.rotationSpeed; if (p.x + p.size > 0) { livePhantoms.push(p); } } phantoms = livePhantoms; }
+        
+        function updateCollectibles() {
+            if (eventState.active && eventState.type === 'BLACK_HOLE') return;
+
+            let spawnRate = gameDifficultySettings.collectibleSpawnRate;
+            let collectiblePool = ["FUEL", "BOOST", "EMP"];
+            if (currentGalaxyIndex > 0) { collectiblePool.push("SHIELD_BATTERY"); }
+            
+            if (gameState === GameState.HYPERDRIVE_ESCAPE) { 
+                if (Math.random() < 0.02) { 
+                    collectibles.push({ x: canvas.width + 30, y: Math.random() * (canvas.height - 30), size: 40, type: COLLECTIBLE_TYPES.EXOTIC_MATTER, speed: Math.random() * 3 + 3 }); 
+                } 
+            } else if (eventState.active && eventState.type === 'NEBULA') { 
+                if (Math.random() < 0.02) { 
+                    collectibles.push({ x: canvas.width + 30, y: Math.random() * (canvas.height - 30), size: 30, type: COLLECTIBLE_TYPES.CHARGED_PARTICLE, speed: Math.random() * 2 + 2 }); 
+                } 
+            } else { 
+                if (Math.random() < spawnRate) { 
+                    const typeName = collectiblePool[Math.floor(Math.random() * collectiblePool.length)]; 
+                    collectibles.push({ x: canvas.width + 30, y: Math.random() * (canvas.height - 30), size: 30, type: COLLECTIBLE_TYPES[typeName], speed: Math.random() * 2 + 2 }); 
+                } 
+            }
+            
+            collectibles = collectibles.filter(c => {
+                 c.x -= (boosting ? c.speed * 4 : c.speed); 
+                 return c.x + c.size > -50;
+            });
+        }
+        
+        function clear() { ctx.fillStyle = GALAXY_ORDER[currentGalaxyIndex].color; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+        function createStars(count, speed, radius, array) { array.length = 0; for (let i = 0; i < count; i++) { array.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, radius: Math.random() * radius, baseSpeed: Math.random() * speed + (speed / 2), alpha: Math.random() * 0.5 + 0.5 }); } }
+        function drawStars(array) { const color = GALAXY_ORDER[currentGalaxyIndex].starColor; array.forEach(star => { ctx.beginPath(); ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2); ctx.fillStyle = `${color} ${star.alpha})`; ctx.fill(); }); }
+        
+        function drawPlanets() { planets.forEach(planet => { const img = planetImages[planet.name]; if (img && img.complete) { ctx.save(); let drawWidth = planet.radius * 2; let drawHeight = planet.radius * 2; if (planet.name === "Saturn") { drawWidth *= 1.8; }  else if (planet.name !== "Sun") { ctx.beginPath(); ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2, true); ctx.clip(); } ctx.drawImage(img, planet.x - drawWidth / 2, planet.y - drawHeight / 2, drawWidth, drawHeight); ctx.restore(); } else { ctx.fillStyle = '#9F7AEA'; ctx.beginPath(); ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2); ctx.fill(); } }); }
+        function drawObstacles() { obstacles.forEach(obstacle => { ctx.save(); ctx.translate(obstacle.x, obstacle.y); ctx.rotate(obstacle.rotation); if (eventState.active && eventState.type === 'NEBULA') { ctx.globalAlpha = 0.4; } 
+            if (obstacle.type === 'alien') { ctx.font = `${obstacle.size * 1.5}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('👾', 0, 0); }
+            else if(obstacle.type === 'crystal') {
+                ctx.fillStyle = '#a0deff'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath();
+                const points = obstacle.shape.map(p => ({ x: p.x * obstacle.size * 1.2, y: p.y * obstacle.size * 1.2 })); // Make crystals sharper
+                ctx.moveTo(points[0].x, points[0].y);
+                for(let i = 1; i < points.length; i++) { ctx.lineTo(points[i].x, points[i].y); }
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+            } 
+            else { const points = obstacle.shape.map(p => ({ x: p.x * obstacle.size, y: p.y * obstacle.size })); ctx.fillStyle = '#8B4513'; ctx.strokeStyle = '#A0522D'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(points[0].x, points[0].y); for(let i = 1; i < points.length; i++) { ctx.lineTo(points[i].x, points[i].y); } ctx.closePath(); ctx.fill(); ctx.stroke(); } 
+            ctx.restore(); }); }
+        function drawPhantoms() { phantoms.forEach(p => { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation); ctx.globalAlpha = 0.2; ctx.fillStyle = '#63b3ed'; ctx.strokeStyle = '#4299e1'; ctx.lineWidth = 2; ctx.beginPath(); const points = p.shape.map(point => ({x: point.x * p.size, y: point.y * p.size})); ctx.moveTo(points[0].x, points[0].y); for(let i = 1; i < points.length; i++) { ctx.lineTo(points[i].x, points[i].y); } ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore(); }); }
+        function createAsteroidShape(radius) { const points = []; const numPoints = Math.floor(Math.random() * 5) + 7; for(let i = 0; i < numPoints; i++) { const angle = (i / numPoints) * Math.PI * 2; const dist = radius * (0.8 + Math.random() * 0.4); points.push({ x: Math.cos(angle) * dist, y: Math.sin(angle) * dist }); } return points; }
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        function drawPlayer() { if (!player.visible) return; ctx.save(); ctx.translate(player.x + player.width / 2, player.y + player.height / 2); ctx.rotate(player.vy * 0.05); ctx.font = `${player.height}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText('🚀', 0, 0); ctx.restore(); }
+        
+        function updateStars(starArray) { starArray.forEach(star => { if (eventState.active && eventState.type === 'BLACK_HOLE' && eventState.hole) { const dx = eventState.hole.x - star.x; const dy = eventState.hole.y - star.y; const dist = Math.hypot(dx, dy); if (dist > 1) { star.x += (dx / dist) * 2.5; star.y += (dy / dist) * 2.5; } } else { let speed = (boosting ? star.baseSpeed * 8 : star.baseSpeed); if (gameState === GameState.HYPERDRIVE_ESCAPE) speed *= 2; star.x -= speed; } if (star.x < -10) { star.x = canvas.width; star.y = Math.random() * canvas.height; } }); }
+        
+        function drawCollectibles() { collectibles.forEach(c => { ctx.font = `${c.size}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(c.type.emoji, c.x, c.y); }); }
+        
+        function updateThrusters() {
+            const isBlackHoleEvent = eventState.active && eventState.type === 'BLACK_HOLE';
+            if ((keys.up || keys.down || boosting || (isBlackHoleEvent && keys.q))) {
+                const count = (boosting || keys.q) ? 5 : 2;
+                for (let i = 0; i < count; i++) {
+                    let p = thrusterParticlePool.pop() || {};
+                    p.y = player.y + player.height / 2 + (Math.random() - 0.5) * 10;
+                    p.life = 20;
+
+                    if (isBlackHoleEvent && keys.q) {
+                        p.x = player.x + player.width; p.size = Math.random() * 6 + 3; p.vx = (Math.random() * 8 + 8);
+                        p.color = ['#90ee90', '#63b3ed', '#ffffff'][Math.floor(Math.random() * 3)];
+                    } else {
+                        p.x = player.x; p.size = Math.random() * (boosting ? 5 : 3) + 1; p.vx = -(Math.random() * 5 + 5);
+                        p.color = ['#ffcc00', '#ffaa00', '#ff6600'][Math.floor(Math.random() * 3)];
+                    }
+                    thrusterParticles.push(p);
+                }
+            }
+            
+            let liveParticles = [];
+            for (const p of thrusterParticles) {
+                p.life--;
+                if (p.life > 0) { p.x += p.vx; liveParticles.push(p); } 
+                else { thrusterParticlePool.push(p); }
+            }
+            thrusterParticles = liveParticles;
+        }
+        function drawThrusters() {
+            ctx.globalAlpha = 0.7;
+            thrusterParticles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * (p.life / 20), 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+        }
+
+        function drawShield() {
+            if (player.visible && shieldActive) {
+                const shieldColor = shieldTimer > 0 ? `rgba(255, 215, 0, ${0.5 + Math.random() * 0.3})` : `rgba(100, 200, 255, ${0.5 + Math.random() * 0.3})`;
+                const fillColor = shieldTimer > 0 ? `rgba(255, 215, 0, ${0.1 + Math.random() * 0.1})` : `rgba(100, 200, 255, ${0.1 + Math.random() * 0.1})`;
+                ctx.strokeStyle = shieldColor; ctx.fillStyle = fillColor; ctx.lineWidth = 3; 
+                ctx.beginPath(); ctx.arc(player.x + player.width / 2, player.y + player.height / 2, player.height, 0, Math.PI * 2); ctx.stroke(); ctx.fill();
+            }
+        }
+        function drawEMPBlast() { if(empBlast.active) { empBlast.radius += 40; ctx.strokeStyle = `rgba(100, 200, 255, ${1 - empBlast.radius / empBlast.maxRadius})`; ctx.lineWidth = 10; ctx.beginPath(); ctx.arc(player.x + player.width/2, player.y + player.height/2, empBlast.radius, 0, Math.PI*2); ctx.stroke(); if(empBlast.radius >= empBlast.maxRadius) empBlast.active = false; } }
+
+        // --- Collision and Game Logic ---
+        function detectCollisions() {
             for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obs = obstacles[i];
-                if (checkCollision(player, obs) && !eventState.active) {
+                const obstacle = obstacles[i];
+                const playerRect = { x: player.x, y: player.y, width: player.width, height: player.height };
+                const obstacleRect = { x: obstacle.x - obstacle.size / 2, y: obstacle.y - obstacle.size / 2, width: obstacle.size, height: obstacle.size };
+                if (player.visible && playerRect.x < obstacleRect.x + obstacleRect.width && playerRect.x + playerRect.width > obstacleRect.x && playerRect.y < obstacleRect.y + obstacleRect.height && playerRect.y + playerRect.height > obstacleRect.y) {
                     if (shieldActive) {
                         obstacles.splice(i, 1);
-                        showPopup("SHIELD DEFLECTED!", 'alert-text');
-                        if(synths.hit) synths.hit.triggerAttackRelease("C2", "8n");
+                        if (synths.shot) synths.shot.triggerAttackRelease("A3", "8n");
                     } else {
-                        endGame(`Destroyed by a ${obs.type === 'alien' ? 'hostile craft' : obs.type === 'crystal' ? 'space crystal' : 'rogue asteroid'}!`);
+                        endGame("You were struck by a cosmic hazard!");
                         return;
                     }
                 }
-                if (empBlast.active && getDistance(obs, empBlast) < empBlast.radius + 10) {
-                    obstacles.splice(i, 1);
-                    if(synths.explosion) synths.explosion.triggerAttackRelease("C3", "8n");
-                }
             }
-
-            // Player/Collectible Collision
             for (let i = collectibles.length - 1; i >= 0; i--) {
-                const coll = collectibles[i];
-                if (checkCollision(player, coll)) {
-                    coll.effect(player);
+                const c = collectibles[i];
+                if (player.visible && player.x < c.x + c.size && player.x + player.width > c.x && player.y < c.y + c.size && player.y + player.height > c.y) {
+                    c.type.effect(player);
                     collectibles.splice(i, 1);
-                    showPopup(`+${coll.type}`, 'popup-text');
                 }
             }
-            
-            // Player Thruster Particles
-            if (keys.up || keys.down || boosting) {
-                createThrusterParticle(player.x, player.y + player.height / 2, boosting ? 4 : 2);
-            }
-            updateThrusterParticles();
-            
-            // Win/Encounter Condition (only in FLYING state and no active major event)
-            if (gameState === GameState.FLYING && planets.length === 0 && !targetHasSpawned && distanceSinceLastEncounter > 5000) {
-                targetHasSpawned = true;
-                const targetPlanet = {
-                    name: targetPlanetName,
-                    x: canvas.width + 1000,
-                    y: canvas.height / 2,
-                    radius: 100,
-                    img: planetImages[targetPlanetName],
-                    vy: 0,
-                    isTarget: true,
-                    orbiting: false
-                };
-                planets.push(targetPlanet);
+        }
+
+        function triggerEMP() {
+            if (player.empCharges > 0) {
+                player.empCharges--;
+                obstacles = [];
+                empBlast = { active: true, radius: 0, maxRadius: canvas.width };
+                if (synths.emp) synths.emp.triggerAttackRelease("8n");
             }
         }
-        
-        // --- BLACK HOLE MINIGAME SPECIFIC FUNCTIONS ---
-        function triggerEvent(eventType, duration) {
-            setGameState(GameState.EVENT);
-            eventState.active = true;
-            eventState.type = eventType;
-            eventState.duration = duration; // Only relevant for ASTEROID_BELT/NEBULA
-            eventState.gracePeriod = 100; // 100 frames to react
 
+        // --- Mini-Game: Orbit ---
+        function triggerMinigame(planet) {
+            setGameState(GameState.ENTERING_ORBIT);
+            const isTarget = !planet.isFlyby;
+            const orbitCount = isTarget ? (Math.random() > 0.5 ? 2 : 1) : 1;
+            minigamePrompt.textContent = isTarget ? `TARGET: ${planet.name}! TAP [SPACE] AT APOGEE TO LAND!` : `SLINGSHOT AROUND ${planet.name}! TAP [SPACE] AT PERIGEE!`;
             minigamePrompt.classList.remove('hidden');
-            obstacles = []; collectibles = []; sceneryObjects = [];
-
-            if (eventType === 'BLACK_HOLE') {
-                // Start the player far to the right
-                player.x = canvas.width - player.width * 2;
-                player.y = canvas.height / 2 - player.height / 2;
-                
-                // Black hole is on the left
-                const holeX = canvas.width * 0.15;
-                const holeY = canvas.height / 2;
-                const holeRadius = 150;
-                eventState.hole = { x: holeX, y: holeY, radius: holeRadius };
-                
-                // Show the prompt
-                minigamePrompt.textContent = "BLACK HOLE PULL! MASH [Q] TO ESCAPE!";
-                if(synths.alert) synths.alert.triggerAttackRelease("C4", "4n");
-            } else if (eventType === 'NEBULA') {
-                minigamePrompt.textContent = "SLOWING FORCE FIELD! BOOST IS IMPAIRED!";
-                if(synths.alert) synths.alert.triggerAttackRelease("D4", "4n");
-                nebulaParticles = [];
-                for (let i = 0; i < 50; i++) {
-                    nebulaParticles.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        size: Math.random() * 5 + 5,
-                        color: `rgba(99, 179, 237, ${Math.random() * 0.5 + 0.2})`,
-                        vx: Math.random() * 0.5 + 0.5
-                    });
-                }
-            } else if (eventType === 'ASTEROID_BELT') {
-                 minigamePrompt.textContent = "ASTEROID BELT! ACTIVATING SHIELD RECOMMENDED!";
-                if(synths.alert) synths.alert.triggerAttackRelease("E4", "4n");
-            } else if (eventType === 'WORMHOLE') {
-                triggerWormholeGame();
-                return;
-            }
-            
-            // Only non-minigame events use the timer to end themselves
-            if (eventType === 'ASTEROID_BELT' || eventType === 'NEBULA') {
-                eventState.flickerInterval = setInterval(() => {
-                    minigamePrompt.classList.toggle('flicker');
-                }, 150);
-                setTimeout(succeedEvent, duration);
-            }
-        }
-
-        function succeedBlackHoleEvent() {
-             eventState.active = false;
-             eventState.type = null;
-             eventState.hole = null;
-             minigamePrompt.classList.add('hidden');
-             showPopup("ESCAPED!", 'popup-text');
-             player.fuel = Math.min(player.maxFuel, player.fuel + 50);
-             if(synths.collect) synths.collect.triggerAttackRelease("E5", "8n");
-             setGameState(GameState.FLYING);
-             player.x = 100; // Reset player position for normal flying
+            const radius = planet.radius;
+            let orbits = [];
+            const orbitScale = radius > 150 ? 1.8 : 2.5;
+            for (let i = 0; i < orbitCount; i++) { orbits.push(radius * (orbitScale - (0.5 * i))); }
+            minigameData = {
+                planet, orbits, currentOrbit: 0, isTargetPlanet: isTarget, originalRadius: radius,
+                angle: Math.atan2(player.y - planet.y, player.x - planet.x), speed: 0.015,
+                escapeWindow: gameDifficultySettings.slingshotWindow, entryProgress: 0,
+                entryStartX: player.x, entryStartY: player.y,
+                entryTargetX: planet.x + Math.cos(Math.PI) * orbits[0],
+                entryTargetY: planet.y + Math.sin(Math.PI) * orbits[0],
+            };
         }
         
-        // ... (rest of the game logic functions) ...
+        function updateEnteringOrbit() {
+            if (!minigameData || !minigameData.planet) return;
+            minigameData.entryProgress += 0.008;
+            minigameData.planet.radius = lerp(minigameData.originalRadius, minigameData.originalRadius * 1.3, minigameData.entryProgress);
+            player.x = lerp(minigameData.entryStartX, minigameData.entryTargetX, minigameData.entryProgress);
+            player.y = lerp(minigameData.entryStartY, minigameData.entryTargetY, minigameData.entryProgress);
+            if (minigameData.entryProgress >= 1) {
+                const orbitScale = minigameData.originalRadius > 150 ? 1.8 : 2.5;
+                for(let i=0; i < minigameData.orbits.length; i++) {
+                    minigameData.orbits[i] = minigameData.planet.radius * (orbitScale - (0.5 * i));
+                }
+                setGameState(GameState.ORBITING);
+            }
+        }
+        
+        function drawEnteringOrbit() {
+            clear();
+            updateStars(farStars); updateStars(midStars); updateStars(stars);
+            drawStars(farStars); drawStars(midStars); drawStars(stars);
+            drawPlanets(); drawPlayer();
+        }
 
-        function succeedEvent() {
-            if (eventState.flickerInterval) { clearInterval(eventState.flickerInterval); eventState.flickerInterval = null; }
+        function updateOrbiting() {
+            if (!minigameData || !minigameData.planet) return;
+            minigameData.angle += (minigameData.speed || 0.015);
+        }
+
+        function drawOrbiting() {
+            if (!minigameData || !minigameData.planet) return;
+            clear();
+            updateStars(farStars); updateStars(midStars); updateStars(stars);
+            drawStars(farStars); drawStars(midStars);
+            const planet = minigameData.planet;
+            drawPlanets();
+            const orbitRadius = minigameData.orbits[minigameData.currentOrbit];
+            player.x = planet.x + Math.cos(minigameData.angle) * orbitRadius - player.width / 2;
+            player.y = planet.y + Math.sin(minigameData.angle) * orbitRadius - player.height / 2;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.2)"; ctx.lineWidth = 1;
+            minigameData.orbits.forEach(r => { ctx.beginPath(); ctx.arc(planet.x, planet.y, r, 0, Math.PI * 2); ctx.stroke(); });
+            let targetAngle = minigameData.isTargetPlanet ? Math.PI : 0;
+            const isFinalOrbit = minigameData.currentOrbit === minigameData.orbits.length - 1;
+            if(minigameData.isTargetPlanet && !isFinalOrbit) { targetAngle = Math.PI; }
+            ctx.strokeStyle = "#f6e05e"; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(planet.x, planet.y, orbitRadius, targetAngle - minigameData.escapeWindow / 2, targetAngle + minigameData.escapeWindow / 2); ctx.stroke();
+            ctx.fillStyle = "white"; ctx.font = "16px Bangers";
+            ctx.fillText("APOGEE", planet.x - orbitRadius - 40, planet.y + 25);
+            ctx.fillText("PERIGEE", planet.x + orbitRadius - 20, planet.y + 25);
+            drawPlayer(); drawStars(stars);
+        }
+
+        function handleMinigameAction() {
+            try {
+                if (!minigameData.planet) return;
+                let targetAngle = minigameData.isTargetPlanet ? Math.PI : 0;
+                const isFinalOrbit = minigameData.currentOrbit === minigameData.orbits.length - 1;
+                if (minigameData.isTargetPlanet && !isFinalOrbit) { targetAngle = Math.PI; }
+                let currentAngle = (minigameData.angle % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
+                const window = minigameData.escapeWindow;
+                const lowerBound = (targetAngle - window / 2 + (Math.PI * 2)) % (Math.PI * 2);
+                const upperBound = (targetAngle + window / 2 + (Math.PI * 2)) % (Math.PI * 2);
+                let inWindow = lowerBound > upperBound ? (currentAngle >= lowerBound || currentAngle <= upperBound) : (currentAngle >= lowerBound && currentAngle <= upperBound);
+                
+                if (inWindow) {
+                    if (synths.shot) synths.shot.triggerAttackRelease("G4", "8n");
+                    if (minigameData.isTargetPlanet) {
+                        if (isFinalOrbit) { missionAccomplished(); } 
+                        else { 
+                            minigameData.currentOrbit++; 
+                            if(minigameData.currentOrbit === minigameData.orbits.length -1) {
+                                minigamePrompt.textContent = "FINAL MANEUVER: TAP [SPACE] AT APOGEE!";
+                            }
+                        }
+                    } else { escapeOrbit(); }
+                } else { endGame("You missed the gravity-well timing and crashed!"); }
+            } catch(e) { console.error("Error in orbit game:", e); escapeOrbit(); }
+        }
+        
+        function escapeOrbit() {
+            showPopup("Slingshot successful!", false);
+            distance += 2500;
+            player.fuel = Math.min(player.maxFuel, player.fuel + 25);
             minigamePrompt.classList.add('hidden');
-            eventState.active = false;
-            eventState.type = null;
-            showPopup("ALL CLEAR!", 'popup-text');
+            if(minigameData && minigameData.planet) {
+                lastVisitedPlanet = minigameData.planet.name;
+                planets = planets.filter(p => p !== minigameData.planet);
+            }
+            minigameData = {};
+            player.x = 100; player.y = canvas.height / 2 - player.height / 2; player.vy = 0;
+            setGameState(GameState.FLYING);
+            setupMissionPath();
+        }
+        
+        // --- Mini-Game: Constellation ---
+        function triggerConstellationGame() {
+            setGameState(GameState.CONSTELLATION_MINIGAME);
+            const names = Object.keys(CONSTELLATIONS);
+            const name = names[Math.floor(Math.random() * names.length)];
+            const data = CONSTELLATIONS[name];
+            const margin = 150;
+            const drawWidth = canvas.width - (margin * 2);
+            const drawHeight = canvas.height - (margin * 2);
+            constellationGame = {
+                name: name,
+                stars: data.stars.map(s => ({ x: s.x * drawWidth + margin, y: s.y * drawHeight + margin, radius: 10 })),
+                lines: data.lines,
+                completedLines: [], selectedStar: null, isAnimating: false,
+                animationProgress: 0, animationStart: null, animationEnd: null, timer: 2400
+            };
+            const timeRemaining = Math.ceil(constellationGame.timer / 60);
+            constellationPrompt.innerHTML = `Trace the constellation: <strong>${name}</strong><br>Time Left: ${timeRemaining}s`;
+            constellationPrompt.classList.remove('hidden');
+        }
+
+        function updateConstellationGame() {
+            try {
+                if (!constellationGame.name) return;
+                constellationGame.timer--;
+                const timeRemaining = Math.ceil(constellationGame.timer / 60);
+                constellationPrompt.innerHTML = `Trace the constellation: <strong>${constellationGame.name}</strong><br>Time Left: ${timeRemaining}s`;
+
+                if (constellationGame.timer <= 0) {
+                    endConstellationGame(false);
+                } else if (constellationGame.isAnimating) {
+                    constellationGame.animationProgress += 0.05;
+                    if (constellationGame.animationProgress >= 1) {
+                        constellationGame.isAnimating = false;
+                        constellationGame.animationProgress = 0;
+                        if (constellationGame.completedLines.length === constellationGame.lines.length) {
+                            endConstellationGame(true);
+                        }
+                    }
+                }
+            } catch(e) { console.error("Error in constellation game:", e); endConstellationGame(false); }
+        }
+
+        function drawConstellationGame() {
+            clear();
+            drawStars(farStars); drawStars(midStars); drawStars(stars);
+            const game = constellationGame;
+            if(!game.stars) return;
+
+            ctx.strokeStyle = "rgba(100, 200, 255, 0.2)"; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+            game.lines.forEach(line => {
+                const start = game.stars[line.from];
+                const end = game.stars[line.to];
+                ctx.beginPath(); ctx.moveTo(start.x, start.y); ctx.lineTo(end.x, end.y); ctx.stroke();
+            });
+            ctx.setLineDash([]);
+
+            ctx.strokeStyle = "#f6e05e"; ctx.lineWidth = 4;
+            game.completedLines.forEach(line => {
+                const start = game.stars[line.from];
+                const end = game.stars[line.to];
+                ctx.beginPath(); ctx.moveTo(start.x, start.y); ctx.lineTo(end.x, end.y); ctx.stroke();
+            });
+
+            if (game.isAnimating) {
+                ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(game.animationStart.x, game.animationStart.y);
+                ctx.lineTo(lerp(game.animationStart.x, game.animationEnd.x, game.animationProgress), lerp(game.animationStart.y, game.animationEnd.y, game.animationProgress));
+                ctx.stroke();
+            }
+
+            game.stars.forEach((star, index) => {
+                ctx.fillStyle = game.selectedStar === index ? "#ffffff" : "#a0deff";
+                ctx.beginPath(); ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2); ctx.fill();
+            });
+        }
+        
+        function endConstellationGame(success) {
+            constellationPrompt.classList.add('hidden');
+            if (success) {
+                showPopup("Constellation Charted! +50 Fuel!", false);
+                player.fuel = Math.min(player.maxFuel, player.fuel + 50);
+                if(synths.victory) synths.victory.triggerAttackRelease("A5", "1n");
+            } else {
+                showPopup("Lost in the stars...", true);
+            }
+            constellationGame = {};
             setGameState(GameState.FLYING);
         }
         
-        // --- PLACEHOLDER FUNCTIONS FOR OTHER MINI-GAMES ---
-        // (These are the original functions to ensure they still work)
-        
-        function drawFlying() {
-            // ... (drawing logic for flying state) ...
-            ctx.fillStyle = GALAXY_ORDER[currentGalaxyIndex].color;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            drawStars(farStars);
-            drawStars(midStars);
-            drawStars(stars);
-            
-            if (eventState.active && eventState.type === 'NEBULA') {
-                drawNebula();
-            }
-
-            drawScenery();
-            drawPlanets();
-
-            // Draw Black Hole (if active)
-            if (eventState.active && eventState.type === 'BLACK_HOLE' && eventState.hole) {
-                drawBlackHole(eventState.hole);
-            }
-
-            // Draw obstacles and collectibles
-            drawObstacles();
-            drawCollectibles();
-            
-            drawThrusterParticles();
-            
-            // Draw Player
-            if (player.visible) drawPlayer();
-
-            // Draw EMP Blast
-            if (empBlast.active) drawEMPBlast();
+        // --- Mini-Game: Wormhole ---
+        function triggerIntergalacticWormhole(destinationIndex) {
+            showPopup("Intergalactic Wormhole Detected!", true);
+            setTimeout(() => {
+                setGameState(GameState.WORMHOLE_MINIGAME);
+                minigamePrompt.textContent = "Stabilize The Vortex!";
+                minigamePrompt.classList.remove('hidden');
+                let level = 3;
+                if (lastDifficulty === 'easy') level = 2;
+                if (lastDifficulty === 'hard') level = 4;
+                wormholeGame = {
+                    sequence: [], playerSequence: [], level: level, state: 'STARTING',
+                    showTimer: 0, currentIndex: 0, flashCorrect: -1, flashIncorrect: false,
+                    destinationIndex: destinationIndex
+                };
+                for (let i = 0; i < wormholeGame.level; i++) { wormholeGame.sequence.push(Math.floor(Math.random() * 4)); }
+                wormholeGame.state = 'SHOWING';
+            }, 2000);
         }
 
-        function drawBlackHole(hole) {
-            ctx.save();
-            ctx.translate(hole.x, hole.y);
-            ctx.rotate(blackHoleRotation);
-            
-            // Outer distortion/accretion disc (faint blue/purple)
-            ctx.shadowColor = '#63b3ed';
-            ctx.shadowBlur = 40;
-            ctx.fillStyle = 'rgba(200, 0, 255, 0.1)';
-            ctx.beginPath();
-            ctx.arc(0, 0, hole.radius * 1.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Inner event horizon (dark red/orange)
-            ctx.shadowColor = '#f56565';
-            ctx.shadowBlur = 20;
-            ctx.fillStyle = 'rgba(255, 69, 0, 0.2)';
-            ctx.beginPath();
-            ctx.arc(0, 0, hole.radius * 1.1, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Core singularity (black)
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#000000';
-            ctx.beginPath();
-            ctx.arc(0, 0, hole.radius, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.restore();
-        }
-
-        // ... (placeholder functions for other minigames, collision detection, drawing, and sound initialization) ...
-
-        function drawNebula() {
-            ctx.save();
-            ctx.globalAlpha = 0.5;
-            for (const p of nebulaParticles) {
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.restore();
-        }
-
-        function updateNebula() {
-            for (let i = nebulaParticles.length - 1; i >= 0; i--) {
-                const p = nebulaParticles[i];
-                p.x -= p.vx;
-                if (p.x < -p.size) {
-                    p.x = canvas.width + p.size;
-                    p.y = Math.random() * canvas.height;
+        function updateWormholeGame() {
+            const game = wormholeGame;
+            if (game.state === 'SHOWING') {
+                game.showTimer = (game.showTimer || 0) + 1;
+                if (game.showTimer > 60) {
+                    game.showTimer = 0;
+                    game.currentIndex++;
+                    if (game.currentIndex >= game.sequence.length) {
+                        game.state = 'PLAYER_TURN';
+                        game.currentIndex = 0;
+                        minigamePrompt.textContent = "Your Turn! (Keys 1-4)";
+                    }
                 }
             }
         }
 
-        function triggerConstellationGame() {
-            // Placeholder: Initialize and transition to Constellation minigame
-             console.log("Starting Constellation Minigame...");
-             minigamePrompt.textContent = "CHART CONSTELLATION! USE MOUSE/TOUCH!";
-             minigamePrompt.classList.remove('hidden');
-             // setGameState(GameState.CONSTELLATION_MINIGAME);
-             succeedEvent(); // Skip for now
-        }
-        
-        function triggerWormholeGame() {
-            // Placeholder: Initialize and transition to Wormhole minigame
-            console.log("Starting Wormhole Minigame...");
-            minigamePrompt.textContent = "WORMHOLE SEQUENCE! REPEAT 1-4!";
-            minigamePrompt.classList.remove('hidden');
-            // setGameState(GameState.WORMHOLE_MINIGAME);
-            succeedEvent(); // Skip for now
-        }
-        
-        function triggerTimingGame() {
-            // Placeholder: Initialize and transition to Timing minigame
-            console.log("Starting Timing Minigame...");
-            minigamePrompt.textContent = "REFLEX CHALLENGE! PRESS [SPACE]!";
-            minigamePrompt.classList.remove('hidden');
-            // setGameState(GameState.TIMING_MINIGAME);
-            succeedEvent(); // Skip for now
-        }
+        function drawWormholeGame() {
+            clear();
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
 
-        function updateConstellationGame() { /* Placeholder */ }
-        function drawConstellationGame() { /* Placeholder */ }
-        function updateWormholeGame() { /* Placeholder */ }
-        function drawWormholeGame() { /* Placeholder */ }
-        function updateTimingGame() { /* Placeholder */ }
-        function drawTimingGame() { /* Placeholder */ }
-        function updateEnteringOrbit() { /* Placeholder */ }
-        function drawEnteringOrbit() { /* Placeholder */ }
-        function updateOrbiting() { /* Placeholder */ }
-        function drawOrbiting() { /* Placeholder */ }
-        function createStars(count, minSpeed, maxSpeed, array) { /* Placeholder */ }
-        function updateStars(array, speedMultiplier) { /* Placeholder */ }
-        function drawStars(array) { /* Placeholder */ }
-        function updatePlanets() { /* Placeholder */ }
-        function drawPlanets() { /* Placeholder */ }
-        function updateScenery() { /* Placeholder */ }
-        function drawScenery() { /* Placeholder */ }
-        function spawnObstacles() { /* Placeholder */ }
-        function updateObstacles(speedMultiplier) { /* Placeholder */ }
-        function drawObstacles() { /* Placeholder */ }
-        function spawnCollectibles() { /* Placeholder */ }
-        function updateCollectibles(speedMultiplier) { /* Placeholder */ }
-        function drawCollectibles() { /* Placeholder */ }
-        function checkCollision(objA, objB) { return false; /* Placeholder */ }
-        function getDistance(objA, objB) { return 0; /* Placeholder */ }
-        function createThrusterParticle(x, y, speed) { /* Placeholder */ }
-        function updateThrusterParticles() { /* Placeholder */ }
-        function drawThrusterParticles() { /* Placeholder */ }
-        function drawPlayer() { /* Placeholder */ }
-        function drawEMPBlast() { /* Placeholder */ }
-        function endGame(reason) { /* Placeholder */ }
-        function showPopup(text, className) { /* Placeholder */ }
-        function startMusic() { /* Placeholder */ }
-        function stopMusic() { /* Placeholder */ }
-        function setupAudio() { /* Placeholder */ }
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(wormholeGame.rotation || 0);
+            wormholeGame.rotation = (wormholeGame.rotation || 0) + 0.01;
+            const gradient = ctx.createRadialGradient(0, 0, 50, 0, 0, 300);
+            gradient.addColorStop(0, '#000');
+            gradient.addColorStop(0.5, '#4a00e0');
+            gradient.addColorStop(1, '#8e2de2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-canvas.width, -canvas.height, canvas.width * 2, canvas.height * 2);
+            ctx.restore();
 
+            const colors = ['#f56565', '#48bb78', '#f6e05e', '#63b3ed'];
+            const positions = [{x: -100, y: -50}, {x: 100, y: -50}, {x: -100, y: 50}, {x: 100, y: 50}];
+            const game = wormholeGame;
 
-        // Placeholder implementations to ensure the rest of the script is runnable
-        function endGame(reason) {
-            cancelAnimationFrame(animationFrameId);
-            stopMusic();
-            gameOverTitle.textContent = reason;
-            finalDistanceDisplay.textContent = `You traveled ${Math.floor(distance / 100)} km.`;
-            const highScore = parseInt(localStorage.getItem('cosmicVoyagerHighScore') || 0);
-            if (Math.floor(distance / 100) > highScore) {
-                localStorage.setItem('cosmicVoyagerHighScore', Math.floor(distance / 100));
-                gameOverHighScoreDisplay.textContent = `NEW HIGH SCORE: ${Math.floor(distance / 100)} km!`;
-            } else {
-                gameOverHighScoreDisplay.textContent = `High Score: ${highScore} km`;
-            }
-            player.visible = false;
-            gameOverScreen.classList.remove('hidden');
-            setGameState(GameState.GAMEOVER);
-        }
-
-        // Initialize Canvas Size and Listeners
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            player.y = canvas.height / 2 - player.height / 2;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // High Score display on Menu
-        highScoreDisplay.textContent = `High Score: ${localStorage.getItem('cosmicVoyagerHighScore') || 0} km`;
-
-        // Event Listeners for Controls and Modals
-        document.querySelectorAll('.difficulty-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                // Ensure audio context is started on user interaction
-                if (!isAudioContextStarted) { Tone.start(); isAudioContextStarted = true; setupAudio(); }
-                startGame(button.dataset.difficulty);
+            positions.forEach((pos, i) => {
+                ctx.fillStyle = colors[i];
+                ctx.globalAlpha = 0.6;
+                if (game.state === 'SHOWING' && game.sequence[game.currentIndex] === i && game.showTimer < 50) {
+                    ctx.globalAlpha = 1;
+                }
+                if (game.flashCorrect === i) {
+                    ctx.globalAlpha = 1;
+                }
+                if (game.flashIncorrect && game.playerSequence[game.currentIndex] === i) {
+                    ctx.fillStyle = "white";
+                    ctx.globalAlpha = 1;
+                }
+                ctx.fillRect(centerX + pos.x - 40, centerY + pos.y - 40, 80, 80);
+                
+                ctx.fillStyle = "white";
+                ctx.font = "40px Bangers";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.globalAlpha = 1;
+                ctx.fillText(i + 1, centerX + pos.x, centerY + pos.y);
             });
-        });
-        restartButton.addEventListener('click', () => { startGame(lastDifficulty); });
-        continueButton.addEventListener('click', () => { 
-            if (currentGalaxyIndex >= GALAXY_ORDER.length - 1) {
-                // Final Escape
-                hyperdrive.active = true;
-                hyperdriveContainer.classList.remove('hidden');
-                resetForNextLeg();
-                setGameState(GameState.HYPERDRIVE_ESCAPE);
-                startMusic();
-            } else {
-                // Inter-Galaxy travel success
-                currentGalaxyIndex++;
-                startNextMissionLeg();
-            }
-            missionScreen.classList.add('hidden');
-        });
-        exitButton.addEventListener('click', () => { 
-            window.location.reload(); 
-        });
 
-        // Keyboard Controls
-        document.addEventListener('keydown', (e) => {
-            if (gameState === GameState.MENU || gameState === GameState.GAMEOVER || gameState === GameState.MISSION_BRIEF) return;
-            switch (e.key) {
-                case 'ArrowUp': keys.up = true; break;
-                case 'ArrowDown': keys.down = true; break;
-                case 'Shift': keys.shift = true; break;
-                case 's': case 'S': keys.shield = true; break;
-                case 'e': case 'E': 
-                    if (player.empCharges > 0 && !empBlast.active) {
-                        player.empCharges--;
-                        empBlast.active = true;
-                        empBlast.radius = 0;
-                        empBlast.maxRadius = canvas.width;
-                        if(synths.emp) synths.emp.triggerAttackRelease("C5", "8n");
-                        showPopup("EMP ACTIVATED!", 'popup-text');
+            if (game.flashCorrect > -1 || game.flashIncorrect) {
+                game.flashTimer = (game.flashTimer || 0) + 1;
+                if (game.flashTimer > 15) {
+                    game.flashTimer = 0;
+                    game.flashCorrect = -1;
+                    game.flashIncorrect = false;
+                }
+            }
+        }
+
+        function handleWormholeInput(keyIndex) {
+            const game = wormholeGame;
+            if (!game.state || game.state !== 'PLAYER_TURN') return;
+
+            game.playerSequence.push(keyIndex);
+            
+            if (game.sequence[game.currentIndex] === keyIndex) {
+                game.flashCorrect = keyIndex;
+                if (synths.collect) synths.collect.triggerAttackRelease(`${['C5', 'E5', 'G5', 'A5'][keyIndex]}`, "16n");
+                game.currentIndex++;
+
+                if (game.currentIndex >= game.sequence.length) {
+                    // Success
+                    wormholeGame = {};
+                    setGameState(GameState.FLYING);
+                    minigamePrompt.classList.add('hidden');
+                    if (game.destinationIndex !== undefined) {
+                        showPopup(`Entering ${GALAXY_ORDER[game.destinationIndex].name}!`, false);
+                        currentGalaxyIndex = game.destinationIndex;
+                        missionQueue = [...GALAXY_ORDER[currentGalaxyIndex].planets].sort(() => 0.5 - Math.random());
+                        startNextMissionLeg();
+                    } else if(game.destination === 'skip') {
+                        showPopup("Quantum Tunnel Successful!", false);
+                        distance += 5000;
+                        if(missionQueue.length > 0) startNextMissionLeg();
                     }
-                    break;
-                case 'q': case 'Q': 
-                    if (eventState.active && eventState.type === 'BLACK_HOLE') { keys.q = true; } 
-                    break;
-                case ' ':
-                    keys.space = true;
-                    if (gameState === GameState.ENTERING_ORBIT || gameState === GameState.ORBITING) handleSlingshotAttempt();
-                    if (gameState === GameState.TIMING_MINIGAME) handleTimingMinigameAttempt();
-                    if (gameState === GameState.HYPERDRIVE_ESCAPE && hyperdrive.charge >= hyperdrive.maxCharge) triggerFinalEscape();
-                    break;
-                case '1': case '2': case '3': case '4': 
-                    if (gameState === GameState.WORMHOLE_MINIGAME) handleWormholeInput(parseInt(e.key));
-                    break;
+                }
+            } else {
+                // Failure
+                game.flashIncorrect = true;
+                if (synths.crash) synths.crash.triggerAttackRelease("C2", "8n");
+                showPopup("Wormhole Collapsed!", true);
+                player.fuel = Math.max(0, player.fuel - 20);
+                wormholeGame = {};
+                setGameState(GameState.FLYING);
+                minigamePrompt.classList.add('hidden');
             }
-        });
+        }
 
-        document.addEventListener('keyup', (e) => {
-            switch (e.key) {
-                case 'ArrowUp': keys.up = false; break;
-                case 'ArrowDown': keys.down = false; break;
-                case 'Shift': keys.shift = false; break;
-                case 's': case 'S': keys.shield = false; break;
-                case 'q': case 'Q': keys.q = false; break;
-                case ' ': keys.space = false; break;
+        // --- Mini-Game: Timing ---
+        function triggerTimingGame() {
+            setGameState(GameState.TIMING_MINIGAME);
+            timingGame = {
+                radius: 200, targetRadius: 50, shrinkRate: 1,
+                successWindow: gameDifficultySettings.timingWindow, state: 'shrinking'
+            };
+            minigamePrompt.textContent = "Press [SPACE] in the Target Zone!";
+            minigamePrompt.classList.remove('hidden');
+        }
+
+        function updateTimingGame() {
+            if (timingGame.state === 'shrinking') {
+                timingGame.radius -= timingGame.shrinkRate;
+                if (timingGame.radius < timingGame.targetRadius - timingGame.successWindow) {
+                    timingGame.state = 'done';
+                    showPopup("Missed!", true);
+                    player.fuel = Math.max(0, player.fuel - 15);
+                    minigamePrompt.classList.add('hidden');
+                    timingGame = {};
+                    setGameState(GameState.FLYING);
+                }
             }
+        }
+
+        function drawTimingGame() {
+            if (timingGame.state !== 'shrinking') return;
+            clear();
+            drawStars(farStars); drawStars(midStars); drawStars(stars);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            ctx.strokeStyle = '#f6e05e'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(centerX, centerY, timingGame.targetRadius, 0, Math.PI * 2); ctx.stroke();
+
+            ctx.strokeStyle = '#63b3ed'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.arc(centerX, centerY, timingGame.radius, 0, Math.PI * 2); ctx.stroke();
+            
+            drawPlayer();
+        }
+
+        function handleTimingAction() {
+            if (timingGame.state !== 'shrinking') return;
+            const diff = Math.abs(timingGame.radius - timingGame.targetRadius);
+            if (diff <= timingGame.successWindow) {
+                showPopup("Perfect! +20 Fuel", false);
+                player.fuel = Math.min(player.maxFuel, player.fuel + 20);
+            } else {
+                showPopup("Missed!", true);
+                player.fuel = Math.max(0, player.fuel - 15);
+            }
+            timingGame.state = 'done';
+            minigamePrompt.classList.add('hidden');
+            timingGame = {};
+            setGameState(GameState.FLYING);
+        }
+
+        // --- Game Flow & State Management ---
+        function missionAccomplished() {
+            setGameState(GameState.MISSION_BRIEF);
+            player.visible = false;
+            minigamePrompt.classList.add('hidden');
+            stopMusic();
+            if(synths.victory) synths.victory.triggerAttackRelease("G5", "1n");
+            
+            lastVisitedPlanet = targetPlanetName;
+            minigameData = {}; // Clear minigame data
+            document.getElementById('mission-title').textContent = `You've reached ${targetPlanetName}!`;
+
+            if (missionQueue.length === 0 && currentGalaxyIndex >= GALAXY_ORDER.length - 1) {
+                document.getElementById('mission-text').textContent = "All planets visited! Your final mission awaits.";
+                continueButton.textContent = "Begin Final Escape";
+            } else if (missionQueue.length === 0) {
+                document.getElementById('mission-text').textContent = `Exploration of ${GALAXY_ORDER[currentGalaxyIndex].name} complete! A wormhole to a new galaxy awaits.`;
+                continueButton.textContent = "Travel to Next Galaxy";
+            } else {
+                document.getElementById('mission-text').textContent = "Rendezvous successful! Prepare for your next assignment.";
+                continueButton.textContent = "Continue Voyage";
+            }
+            missionScreen.classList.remove('hidden');
+        }
+
+        function finalEscapeMission() {
+            setGameState(GameState.HYPERDRIVE_ESCAPE);
+            missionScreen.classList.add('hidden');
+            resetForNextLeg();
+            player.fuel = player.maxFuel;
+            targetDisplay.textContent = "TARGET: ESCAPE THE GALAXY";
+            hyperdrive.charge = 0;
+            hyperdrive.active = true;
+            hyperdriveContainer.classList.remove('hidden');
+            startMusic();
+            showPopup("FINAL OBJECTIVE: CHARGE THE HYPERDRIVE!", true);
+            if(!animationFrameId) gameLoop();
+        }
+
+        function finalVictory() {
+            setGameState(GameState.GAMEOVER);
+            stopMusic();
+            if (synths.victory) synths.victory.triggerAttackRelease(["C5", "E5", "G5", "C6"], "1n");
+            let highScore = localStorage.getItem('cosmicVoyagerHighScore') || 0;
+            if (distance > highScore) { highScore = distance; localStorage.setItem('cosmicVoyagerHighScore', highScore); }
+            
+            gameOverScreen.classList.remove('hidden');
+            missionScreen.classList.add('hidden');
+            hyperdriveContainer.classList.add('hidden');
+            minigamePrompt.classList.add('hidden');
+
+            gameOverTitle.textContent = "GALAXY ESCAPED!";
+            finalDistanceDisplay.textContent = `You left the known universe behind and traveled ${Math.floor(distance)} km!`;
+            gameOverHighScoreDisplay.textContent = `High Score: ${Math.floor(highScore)} km`;
+        }
+        
+        function endGame(reason) {
+            if (gameState === GameState.GAMEOVER) return;
+            setGameState(GameState.GAMEOVER);
+            stopMusic();
+            if (eventState.flickerInterval) clearInterval(eventState.flickerInterval);
+
+            let highScore = localStorage.getItem('cosmicVoyagerHighScore') || 0;
+            if (distance > highScore) { highScore = distance; localStorage.setItem('cosmicVoyagerHighScore', highScore); }
+
+            gameOverScreen.classList.remove('hidden');
+            constellationPrompt.classList.add('hidden');
+            minigamePrompt.classList.add('hidden');
+            hyperdriveContainer.classList.add('hidden');
+            gameOverTitle.textContent = "Mission Failed!";
+            finalDistanceDisplay.textContent = `You traveled ${Math.floor(distance)} km. ${reason}`;
+            gameOverHighScoreDisplay.textContent = `High Score: ${Math.floor(highScore)} km`;
+        }
+
+        function initGame() {
+            if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+            setGameState(GameState.MENU);
+            stopMusic();
+            let highScore = localStorage.getItem('cosmicVoyagerHighScore') || 0;
+            highScoreDisplay.textContent = `High Score: ${Math.floor(highScore)} km`;
+            startScreen.classList.remove('hidden');
+            gameOverScreen.classList.add('hidden');
+            missionScreen.classList.add('hidden');
+            minigamePrompt.classList.add('hidden');
+            minigamePrompt.textContent = "";
+            hyperdriveContainer.classList.add('hidden');
+            init();
+        }
+
+        function lerp(a, b, t) { return a * (1 - t) + b * t; }
+        
+        function triggerEvent(type, duration) {
+            if (type === 'WORMHOLE') {
+                return setTimeout(() => {
+                    setGameState(GameState.WORMHOLE_MINIGAME);
+                    minigamePrompt.textContent = "Stabilize The Vortex!";
+                    minigamePrompt.classList.remove('hidden');
+                    let level = 3;
+                    if (lastDifficulty === 'easy') level = 2;
+                    if (lastDifficulty === 'hard') level = 4;
+                    wormholeGame = {
+                        sequence: [], playerSequence: [], level: level, state: 'STARTING', showTimer: 0,
+                        currentIndex: 0, flashCorrect: -1, flashIncorrect: false, destination: duration
+                    };
+                    for (let i = 0; i < wormholeGame.level; i++) { wormholeGame.sequence.push(Math.floor(Math.random() * 4)); }
+                    wormholeGame.state = 'SHOWING';
+                }, 1000);
+            }
+            eventState = { active: true, type, duration, gracePeriod: 0 };
+            if (type === 'BLACK_HOLE') {
+                showPopup("GRAVITATIONAL ANOMALY! ESCAPE!", true);
+                eventState.hole = { x: 50, y: canvas.height / 2, radius: 150 };
+                eventState.gracePeriod = 60;
+                sceneryObjects.push({ x: canvas.width + 250, y: canvas.height / 2, speed: 5, size: 50, emoji: '🛰️', rotation: -0.5 });
+            }
+            if (type === 'NEBULA' || type === 'ASTEROID_BELT') {
+                showPopup(`ENTERING ${type.replace("_", " ")}!`, type === 'ASTEROID_BELT');
+                 if(type === 'NEBULA') {
+                    nebulaParticles = [];
+                    Array.from({length: 50}).forEach(() => {
+                        nebulaParticles.push({
+                            x: Math.random() * canvas.width * 1.5, y: Math.random() * canvas.height,
+                            radius: Math.random() * 80 + 80, speed: Math.random() * 0.1 + 0.1,
+                            color: `rgba(${Math.random()*50 + 100}, ${Math.random()*50}, ${Math.random()*100 + 155}, ${Math.random()*0.1 + 0.05})`
+                        });
+                    });
+                }
+                eventState.flickerInterval = setInterval(() => {
+                    const elements = [distanceDisplay, empDisplay, fuelContainer];
+                    const el = elements[Math.floor(Math.random() * elements.length)];
+                    el.classList.add('flicker');
+                    setTimeout(() => el.classList.remove('flicker'), 400);
+                }, 2000);
+            }
+        }
+
+        function showPopup(message, isAlert) {
+            popupText.textContent = message;
+            popupText.className = isAlert ? "popup-text alert-text" : "popup-text";
+            popupContainer.classList.remove('hidden');
+            setTimeout(() => popupContainer.classList.add('hidden'), 3000);
+        }
+
+        // --- Audio Setup ---
+        function setupAudioSynths() {
+            if (synths.crash) return;
+            synths.crash = new Tone.MetalSynth({ frequency: 50, envelope: { attack: 0.001, decay: 1.4, release: 0.2 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).toDestination();
+            synths.shot = new Tone.FMSynth({ harmonicity: 1.2, modulationIndex: 10, envelope: { attack: 0.01, decay: 0.5, release: 0.2 }, modulationEnvelope: { attack: 0.01, decay: 0.3, release: 0.2 } }).toDestination();
+            synths.victory = new Tone.PolySynth(Tone.Synth).toDestination();
+            synths.collect = new Tone.Synth({ oscillator: { type: "sine" }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+            synths.emp = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 } }).toDestination();
+            synths.emp.volume.value = -18;
+            synths.bgm = new Tone.FMSynth({ harmonicity: 0.5, modulationIndex: 1.2, envelope: { attack: 0.1, decay: 0.5, release: 1 }, modulationEnvelope: { attack: 0.05, decay: 0.2, release: 0.8 } }).toDestination();
+            synths.bgm.volume.value = -25;
+            const melody = ["C2", "Eb2", "G2", "C3", "G2", "Eb2"];
+            synths.bgm_sequence = new Tone.Sequence((time, note) => { if (synths.bgm) synths.bgm.triggerAttackRelease(note, "8n", time); }, melody, "4n");
+            Tone.Transport.bpm.value = 90;
+        }
+        function startMusic() { if (Tone.Transport.state !== 'started') { synths.bgm_sequence.start(0); Tone.Transport.start(); } }
+        function stopMusic() { if (Tone.Transport.state === 'started') { Tone.Transport.stop(); synths.bgm_sequence.stop(0); } }
+
+        function preloadImages(sources) {
+            return new Promise(resolve => {
+                let loaded = 0;
+                const numImages = Object.keys(sources).length;
+                if (numImages === 0) return resolve();
+                for (const key in sources) {
+                    planetImages[key] = new Image();
+                    planetImages[key].crossOrigin = "Anonymous";
+                    planetImages[key].onload = planetImages[key].onerror = () => { if (++loaded >= numImages) { resolve(); } };
+                    planetImages[key].src = sources[key];
+                }
+            });
+        }
+        
+        // --- Event Listeners ---
+        document.addEventListener('keydown', e => {
+            if (e.repeat) return;
+            if (e.code === 'Space') {
+                if ((gameState === GameState.ORBITING && handleMinigameAction()) ||
+                    (gameState === GameState.TIMING_MINIGAME && handleTimingAction()) ||
+                    (gameState === GameState.HYPERDRIVE_ESCAPE && hyperdrive.charge >= hyperdrive.maxCharge && finalVictory())) {
+                    e.preventDefault();
+                }
+                keys.space = true;
+            } else if (gameState === GameState.WORMHOLE_MINIGAME && e.key >= '1' && e.key <= '4') {
+                e.preventDefault();
+                handleWormholeInput(parseInt(e.key) - 1);
+            } else if (e.key === 'e' || e.key === 'E') {
+                e.preventDefault(); triggerEMP();
+            } else if (e.key === 'q' || e.key === 'Q') {
+                e.preventDefault(); keys.q = true;
+                if (gameState === GameState.EVENT && eventState.type === 'BLACK_HOLE' && synths.shot) {
+                    synths.shot.triggerAttackRelease("C3", "16n");
+                }
+            } else if (e.key === 'ArrowUp') keys.up = true;
+            else if (e.key === 'ArrowDown') keys.down = true;
+            else if (e.key === 'Shift') keys.shift = true;
+            else if (e.key === 's' || e.key === 'S') keys.shield = true;
+        });
+        document.addEventListener('keyup', e => {
+            if (e.code === 'Space') keys.space = false;
+            else if (e.key === 'q' || e.key === 'Q') keys.q = false;
+            else if (e.key === 'ArrowUp') keys.up = false;
+            else if (e.key === 'ArrowDown') keys.down = false;
+            else if (e.key === 'Shift') keys.shift = false;
+            else if (e.key === 's' || e.key === 'S') keys.shield = false;
         });
 
         // Mobile Controls
-        upButton.addEventListener('touchstart', (e) => { e.preventDefault(); keys.up = true; });
-        upButton.addEventListener('touchend', (e) => { e.preventDefault(); keys.up = false; });
-        downButton.addEventListener('touchstart', (e) => { e.preventDefault(); keys.down = true; });
-        downButton.addEventListener('touchend', (e) => { e.preventDefault(); keys.down = false; });
-        shieldButton.addEventListener('touchstart', (e) => { e.preventDefault(); keys.shield = true; });
-        shieldButton.addEventListener('touchend', (e) => { e.preventDefault(); keys.shield = false; });
-        
-        // --- End of Placeholder Implementations (for brevity/focus on the requested fix) ---
+        upButton.addEventListener('mousedown', () => keys.up = true);
+        downButton.addEventListener('mousedown', () => keys.down = true);
+        shieldButton.addEventListener('mousedown', () => keys.shield = true);
+        upButton.addEventListener('touchstart', e => { e.preventDefault(); keys.up = true; });
+        downButton.addEventListener('touchstart', e => { e.preventDefault(); keys.down = true; });
+        shieldButton.addEventListener('touchstart', e => { e.preventDefault(); keys.shield = true; });
+        document.addEventListener('mouseup', () => { keys.up = false; keys.down = false; keys.shield = false; });
+        document.addEventListener('touchend', () => { keys.up = false; keys.down = false; keys.shield = false; });
 
+        // Constellation Interaction
+        function handleInteractionStart(e) {
+            e.preventDefault();
+            if (gameState !== GameState.CONSTELLATION_MINIGAME || !constellationGame.stars || constellationGame.isAnimating) return;
+            const { x, y } = getCanvasCoords(e);
+            const clickedStarIndex = constellationGame.stars.findIndex(star => Math.hypot(x - star.x, y - star.y) < star.radius * 2);
+            if (clickedStarIndex !== -1) { constellationGame.selectedStar = clickedStarIndex; }
+        }
+        function handleInteractionEnd(e) {
+            e.preventDefault();
+            if (gameState !== GameState.CONSTELLATION_MINIGAME || !constellationGame.stars || constellationGame.selectedStar === null || constellationGame.isAnimating) return;
+            
+            const { x, y } = getCanvasCoords(e);
+            if (x === null) { // Handle case where touch ends outside canvas
+                constellationGame.selectedStar = null;
+                return;
+            }
+            
+            const releasedStarIndex = constellationGame.stars.findIndex(star => Math.hypot(x - star.x, y - star.y) < star.radius * 2);
+
+            if (releasedStarIndex !== -1 && releasedStarIndex !== constellationGame.selectedStar) {
+                const startIdx = constellationGame.selectedStar;
+                const endIdx = releasedStarIndex;
+                
+                // *** FIX STARTS HERE ***
+                // Find a line in the master list that matches the user's drawn line and is not already completed.
+                const lineToComplete = constellationGame.lines.find(line => {
+                    const matchesDrawnLine = (line.from === startIdx && line.to === endIdx) || (line.from === endIdx && line.to === startIdx);
+                    if (!matchesDrawnLine) {
+                        return false;
+                    }
+                    const isAlreadyCompleted = constellationGame.completedLines.some(completed =>
+                        (completed.from === line.from && completed.to === line.to) || (completed.from === line.to && completed.to === line.from)
+                    );
+                    return !isAlreadyCompleted;
+                });
+                // *** FIX ENDS HERE ***
+
+                if (lineToComplete) {
+                    constellationGame.completedLines.push(lineToComplete);
+                    constellationGame.isAnimating = true;
+                    constellationGame.animationStart = constellationGame.stars[startIdx];
+                    constellationGame.animationEnd = constellationGame.stars[endIdx];
+                    constellationGame.animationProgress = 0;
+                    if(synths.shot) synths.shot.triggerAttackRelease("C5", "8n");
+                }
+            }
+            constellationGame.selectedStar = null;
+        }
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.type.startsWith('touch')) {
+                const touch = e.changedTouches ? e.changedTouches[0] : (e.touches ? e.touches[0] : null);
+                if(touch) { clientX = touch.clientX; clientY = touch.clientY; }
+                else { clientX = null; clientY = null; }
+            } else { clientX = e.clientX; clientY = e.clientY; }
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+        canvas.addEventListener('mousedown', handleInteractionStart);
+        canvas.addEventListener('mouseup', handleInteractionEnd);
+        canvas.addEventListener('touchstart', handleInteractionStart, { passive: false });
+        canvas.addEventListener('touchend', handleInteractionEnd);
+        
+        // Button Listeners
+        document.querySelectorAll('.difficulty-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                if(!isAudioContextStarted){ await Tone.start(); isAudioContextStarted = true; setupAudioSynths(); }
+                startGame(button.dataset.difficulty);
+            });
+        });
+        restartButton.addEventListener('click', () => startGame(lastDifficulty));
+        exitButton.addEventListener('click', initGame);
+        continueButton.addEventListener('click', () => {
+            missionScreen.classList.add('hidden');
+            if (continueButton.textContent === "Begin Final Escape") {
+                finalEscapeMission();
+            } else {
+                startMusic();
+                startNextMissionLeg();
+            }
+        });
+
+        // Window Load/Resize
+        window.onload = async () => {
+            resizeCanvas();
+            const difficultySelector = document.getElementById('difficulty-selection');
+            difficultySelector.style.display = 'none';
+            highScoreDisplay.textContent = "Loading cosmic assets...";
+            await preloadImages(imageSources);
+            difficultySelector.style.display = 'flex';
+            initGame();
+        };
+        window.addEventListener('resize', resizeCanvas);
     </script>
 </body>
 </html>
+                
